@@ -5,8 +5,8 @@ import HelloWorld from '@/components/HelloWorld.vue';
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <img alt="ffxiv 9card logo" src="./assets/9card.png" />
+  <HelloWorld msg="FFXIV 九宫幻卡工具"/>
 </template>
 
 <style>
