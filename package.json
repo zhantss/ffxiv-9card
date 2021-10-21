@@ -22,6 +22,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-vue": "^7.19.1",
     "naive-ui": "^2.19.9",
+    "sass": "^1.43.2",
     "typescript": "^4.4.3",
     "vfonts": "^0.1.0",
     "vite": "^2.6.4",
