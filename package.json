@@ -1,10 +1,12 @@
 {
   "name": "ffxiv-9card",
   "version": "0.0.0",
+  "main": "main.js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "electron:serve": "electron ."
   },
   "dependencies": {
     "vue": "^3.2.16",
@@ -16,6 +18,8 @@
     "@typescript-eslint/parser": "^5.1.0",
     "@vicons/material": "^0.11.0",
     "@vitejs/plugin-vue": "^1.9.3",
+    "electron": "^15.3.0",
+    "electron-store": "^8.0.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-alias": "^1.1.2",

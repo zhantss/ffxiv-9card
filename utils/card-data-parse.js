@@ -108,8 +108,9 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
         description: "初始卡组"
       }]
     }
+    item.values = item.values.map(value => Number.parseInt(value, 10) > 9 ? 'A' : value);
     cards.push(item)
-    fs.writeFileSync(__dirname + '/ffxiv-9card.json', JSON.stringify(cards));
   });
+  fs.writeFileSync(__dirname + '/ffxiv-9card.json', JSON.stringify(cards));
 });
 

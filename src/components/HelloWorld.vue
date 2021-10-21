@@ -14,9 +14,6 @@ export default defineComponent({
 
 <template>
   <h1>{{ msg }}</h1>
-
-  <p>See <code>README.md</code> for more information.</p>
-
 </template>
 
 <style scoped>
