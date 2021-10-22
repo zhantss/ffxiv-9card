@@ -6,7 +6,9 @@ import {
 } from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 import CardList from '@/components/CardList.vue';
+import TopBar from './components/TopBar.vue';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { proxy }: any = getCurrentInstance();
 onMounted(() => {
   if (proxy && proxy.$loadUserCard) {
@@ -18,6 +20,9 @@ onMounted(() => {
 <template>
   <n-image alt="ffxiv 9card logo" height="128" width="128" src='./9card.png' />
   <HelloWorld msg="FFXIV 九宫幻卡工具"/>
+  <n-space justify="space-around">
+    <TopBar />
+  </n-space>
   <n-space justify="space-around">
     <CardList />
   </n-space>

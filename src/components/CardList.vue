@@ -48,8 +48,9 @@ export default defineComponent({
   </n-space>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .card-box-loading {
-  min-width: 1000px;
+  min-width: 980px;
+  max-width: 980px;
 }
 </style>

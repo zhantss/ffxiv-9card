@@ -14,7 +14,11 @@ export default defineComponent({
   },
   methods: {
     openWiki(url?: string) {
-      window.open(url);
+      if (window.$electron?.ipcRenderer) {
+        window.$electron?.ipcRenderer.invoke('openUrl', url);
+      } else {
+        window.open(url);
+      }
     },
   },
   setup(props) {
@@ -23,6 +27,7 @@ export default defineComponent({
         empty: true,
       };
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { proxy }: any = getCurrentInstance();
     const userCard = proxy?.$userCard;
     // eslint-disable-next-line vue/no-setup-props-destructure
@@ -138,9 +143,9 @@ export default defineComponent({
   </n-grid>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .card-box {
-  max-width: 1080px;
+  max-width: 980px;
 }
 .card-surface {
   position: relative;

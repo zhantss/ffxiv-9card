@@ -1,25 +1,56 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
-    "electron:serve": "electron ."
+    "electron:serve": "electron .",
+    "electron:build": "vite build && electron-builder"
+  },
+  "build": {
+    "appId": "pro.zhantss.ffxiv.9card",
+    "productName": "ffxiv-9card",
+    "files": [
+      "dist/**",
+      "public/**",
+      "main.js",
+      "preload.js"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicon_256.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/favicon_256.ico",
+      "installerHeaderIcon": "public/favicon_256.ico",
+      "deleteAppDataOnUninstall": true
+    },
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist/electron"
+    }
   },
   "dependencies": {
     "vue": "^3.2.16",
     "vue-router": "^4.0.12",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "electron-store": "^8.0.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "@vicons/material": "^0.11.0",
     "@vitejs/plugin-vue": "^1.9.3",
+    "cross-env": "^7.0.3",
     "electron": "^15.3.0",
-    "electron-store": "^8.0.1",
+    "electron-builder": "^22.13.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-alias": "^1.1.2",
