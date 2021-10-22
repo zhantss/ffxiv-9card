@@ -4,13 +4,17 @@
 import {
   getCurrentInstance, onMounted,
 } from 'vue';
+import { useStore } from '@/store';
 import HelloWorld from '@/components/HelloWorld.vue';
 import CardList from '@/components/CardList.vue';
-import TopBar from './components/TopBar.vue';
+import CardData from '@/assets/ffxiv-9card.json';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { proxy }: any = getCurrentInstance();
 onMounted(() => {
+  // push cardData to Store
+  const store = useStore();
+  store.commit('pushCardData', CardData);
   if (proxy && proxy.$loadUserCard) {
     proxy.$loadUserCard();
   }
@@ -18,14 +22,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-image alt="ffxiv 9card logo" height="128" width="128" src='./9card.png' />
-  <HelloWorld msg="FFXIV 九宫幻卡工具"/>
-  <n-space justify="space-around">
-    <TopBar />
-  </n-space>
-  <n-space justify="space-around">
-    <CardList />
-  </n-space>
+  <n-notification-provider>
+    <HelloWorld msg="FFXIV 九宫幻卡工具"/>
+  </n-notification-provider>
+    <n-space justify="space-around" class="main-box">
+      <CardList />
+    </n-space>
 </template>
 
 <style>

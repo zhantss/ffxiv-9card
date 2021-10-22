@@ -26,16 +26,43 @@ ipc.handle('exportCardInfo', () => {
   const win = BrowserWindow.getFocusedWindow();
   dialog.showSaveDialog(win, {
     title: '导出',
-    defaultPath: path.resolve(__dirname, './user/card.json'),
+    defaultPath: path.resolve(__dirname, './config/card.json'),
     filters: [
       { name: 'json', extensions: ['json'] },
     ],
   }).then((result) => {
     fs.writeFileSync(result.filePath, JSON.stringify(store.get('card')));
+    win.webContents.send('successMessage', '导出成功');
+  }).catch((err) => {
+    win.webContents.send('errorMessage', err.toString());
   });
 });
 
-Menu.setApplicationMenu(null);
+ipc.handle('importCardInfo', () => {
+  const win = BrowserWindow.getFocusedWindow();
+  dialog.showOpenDialog(win, {
+    title: '导入',
+    buttonLabel: '导入',
+    message: '选择要导入的文件',
+    defaultPath: path.resolve(__dirname, './config/card.json'),
+    filters: [
+      { name: 'json', extensions: ['json'] },
+    ],
+  }).then((result) => {
+    const file = result.filePaths[0];
+    const data = fs.readFileSync(file);
+    const cards = JSON.parse(data);
+    if (cards) {
+      win.webContents.send('importUserData', cards);
+    }
+  }).catch((err) => {
+    win.webContents.send('errorMessage', err.toString());
+  });
+});
+
+if (process.env.NODE_ENV !== 'development') {
+  Menu.setApplicationMenu(null);
+}
 
 const createWindow = (width, height) => {
   const bwin = new BrowserWindow({

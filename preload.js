@@ -16,4 +16,16 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('$electron', {
   ipcRenderer,
+  api: {
+    on: (channel, callback) => ipcRenderer.on(channel, (event, argv) => callback(event, argv)),
+    openUrl: async (url) => {
+      console.log(url);
+      ipcRenderer.invoke('openUrl', url);
+    },
+    getStoreValue: async (key) => ipcRenderer.invoke('getStoreValue', key),
+    setStoreValue: async (key, data) => ipcRenderer.invoke('setStoreValue', key, data),
+    deleteStoreValue: async (key) => ipcRenderer.invoke('deleteStoreValue', key),
+    exportCardInfo: async () => ipcRenderer.invoke('exportCardInfo'),
+    importCardInfo: async () => ipcRenderer.invoke('importCardInfo'),
+  },
 });

@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
-    "electron:serve": "electron .",
+    "electron:serve": "cross-env NODE_ENV=development electron .",
     "electron:build": "vite build && electron-builder"
   },
   "build": {

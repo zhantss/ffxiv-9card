@@ -1,8 +1,9 @@
 <script lang="ts">
 import {
-  defineComponent, PropType, ref, getCurrentInstance,
+  defineComponent, PropType,
 } from 'vue';
 import MenuBookOutlined from '@vicons/material/MenuBookOutlined';
+import { useStore } from '@/store';
 import { Card } from '../types';
 
 export default defineComponent({
@@ -14,11 +15,20 @@ export default defineComponent({
   },
   methods: {
     openWiki(url?: string) {
-      if (window.$electron?.ipcRenderer) {
-        window.$electron?.ipcRenderer.invoke('openUrl', url);
+      if (window.$electron?.api) {
+        window.$electron?.api.openUrl(url);
       } else {
         window.open(url);
       }
+    },
+  },
+  computed: {
+    have() {
+      // console.log(this.$store.state.userData);
+      if (this.id != null) {
+        return this.$store.state.userData[this.id] === true;
+      }
+      return false;
     },
   },
   setup(props) {
@@ -27,22 +37,13 @@ export default defineComponent({
         empty: true,
       };
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { proxy }: any = getCurrentInstance();
-    const userCard = proxy?.$userCard;
+    const store = useStore();
     // eslint-disable-next-line vue/no-setup-props-destructure
     const {
-      id, name, rarity, org, patch, values, acqs, icon, surface, haveIt, wiki,
+      id, name, rarity, org, patch, values, acqs, icon, surface, wiki,
     } = props.card;
-    const have = ref(userCard != null && userCard[id] != null ? userCard[id] : haveIt);
-    const haveIdChange = async (value: string) => {
-      if (window.$electron?.ipcRenderer) {
-        if (value) {
-          window.$electron.ipcRenderer.invoke('setStoreValue', `card.${id}`, value);
-        } else {
-          window.$electron.ipcRenderer.invoke('deleteStoreValue', `card.${id}`);
-        }
-      }
+    const haveIdChange = async (value: boolean) => {
+      store.dispatch('saveUserCard', { id, value });
     };
     return {
       empty: false,
@@ -55,7 +56,6 @@ export default defineComponent({
       acqs,
       icon,
       surface,
-      have,
       wiki,
       haveIdChange,
     };

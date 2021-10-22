@@ -1,25 +1,33 @@
 <script lang="ts">
-import { defineComponent, toRefs } from 'vue';
-import { useStore } from 'vuex';
-import CardData from '@/assets/ffxiv-9card.json';
-import Card from './Card.vue';
+import {
+  defineComponent, toRefs,
+} from 'vue';
+import { useStore } from '@/store';
+import CardUI from '@/components/Card.vue';
+import TopBar from '@/components/TopBar.vue';
 
 export default defineComponent({
   components: {
-    Card,
+    CardUI,
+    TopBar,
+  },
+  computed: {
+    data() {
+      const { state } = useStore();
+      const { cardData } = state;
+      return cardData.sort(
+        (a, b) => {
+          const posa = a.pos == null ? '0' : a.pos;
+          const posb = b.pos == null ? '0' : b.pos;
+          return Number.parseInt(posa, 10) - Number.parseInt(posb, 10);
+        },
+      );
+    },
   },
   setup() {
     const { state } = useStore();
     const { loading } = toRefs(state);
-    const data = CardData.sort(
-      (a, b) => {
-        const posa = a.pos == null ? '0' : a.pos;
-        const posb = b.pos == null ? '0' : b.pos;
-        return Number.parseInt(posa, 10) - Number.parseInt(posb, 10);
-      },
-    );
     return {
-      data,
       loading,
     };
   },
@@ -27,8 +35,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <n-space vertical v-if="!loading">
-    <Card v-for="card in data" :key="card?.pos" :card="card" />
+  <n-space vertical v-if="!loading" style='max-width: 980px'>
+    <TopBar />
+    <CardUI v-for="card in data" :key="card?.pos" :card="card" />
   </n-space>
   <n-space vertical v-else>
     <n-card
