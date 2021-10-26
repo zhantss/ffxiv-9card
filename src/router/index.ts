@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '@/layout/Home.vue';
-import CardLibrary from '@/components/CardLibrary.vue';
+import LoadingMask from '@/layout/LoadingMask.vue';
 import CardAbout from '@/components/CardAbout.vue';
+import CardLibrary from '@/components/CardLibrary.vue';
 
 export default createRouter({
   // electorn support
@@ -10,10 +11,14 @@ export default createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      components: {
+        default: Home,
+        LoadingMask,
+      },
       children: [
         {
           path: '',
+          meta: { keep: true },
           component: CardLibrary,
         },
         {

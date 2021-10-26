@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // eslint-disable-next-line no-unused-vars
-const emits = defineEmits<{(e: 'chose', id: string | undefined): void}>();
+const emits = defineEmits<{(e: 'chose', id: string | undefined): void | undefined }>();
 
 const thisChose = (id: string | undefined) => {
   emits('chose', id);

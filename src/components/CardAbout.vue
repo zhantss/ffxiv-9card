@@ -204,7 +204,7 @@ const columns = createColumns({
             <n-space align="center">
               <n-avatar
                 v-if="aboutDetails?.avator" :size="56"
-                :src="`ffxiv/${route.params.ext}/${aboutDetails?.avator}`"></n-avatar>
+                :src="`ffxiv/${currentExt}/${aboutDetails?.avator}`"></n-avatar>
               <n-avatar class="empty-avatar" :style="{
                   '--color': 'rgba(255,255,255,0)',
                 }"

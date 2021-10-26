@@ -5,6 +5,8 @@ import {
 import { Card } from '@/types';
 import cardRecord from '@/assets/ffxiv-9card-record.json';
 import cardExt from '@/assets/ffxiv-9card-ext.json';
+import cardTags from '@/assets/ffxiv-9card-tags.json';
+import cardKeys from '@/assets/ffxiv-9card-card-keys.json';
 import UserCardDB from '@/store/db';
 
 export interface State {
@@ -12,6 +14,10 @@ export interface State {
   cardKeys: Array<string>,
   userCard: Set<string>,
   cardRecord: Record<string, Card>,
+  cardTags: Array<{
+    id: string,
+    tags: Array<string>,
+  }>,
   cardExt: {
     menu: Record<string, string>,
     sorts?: Record<string, Array<string>>,
@@ -36,12 +42,6 @@ export function useStore() {
   return basicUseStore(storeKey);
 }
 
-const getCardKeys = () => {
-  const record: Record<string, Card> = cardRecord;
-  return Object.keys(record).sort((a, b) => record[a].pos - record[b].pos);
-};
-
-const cardKeys = getCardKeys();
 const cardCount = cardKeys.length;
 
 export default createStore<State>({
@@ -51,6 +51,7 @@ export default createStore<State>({
     userCard: new Set(),
     cardRecord,
     cardExt,
+    cardTags,
     cardCount,
     userCardCount: 0,
   },

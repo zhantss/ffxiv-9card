@@ -31,8 +31,14 @@ function createTags(items) {
   return tags;
 }
 
+function pushTag(tags, tag) {
+  return tags.concat(createTags(tag));
+}
+
+
 const cards = [];
 const cardRecord = {};
+const cardTags = {};
 fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
   if (err) {
     console.error(err);
@@ -70,12 +76,19 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
       item.pos = (1000 + Number.parseInt(item.id.substr(3), 10));
       item.id = `编号外${fillId(item.id.substr(3))}`;
     }
+    const curTags = new Set();
+    // search tag id
+    if (cardTags[item.id] == null) {
+      cardTags[item.id] = [item.id.startsWith('编号外') ? item.id.substr(3) : item.id];
+      curTags.add(item.name);
+    }
     // acq
     if (item.id.toString() == '306') {
       item.acqs = [{
         type: 'other',
         description: '摩杜纳 (X: 22.78, Y: 6.66)卡·因塔纳处用红色未知蛮神图腾×1,绿色未知蛮神图腾×1,白色未知蛮神图腾×1购买'
       }]
+      curTags.add('摩杜纳');
     } else if (item.acqs.length > 0) {
       const cacqs = item.acqs.split('\n');
       const acqs = [];
@@ -86,11 +99,11 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
           const matchs = cacq.match(/与(\S+)(.+?)的(\S+)进行幻卡对战/);
           if (matchs.length == 4) {
             let npc_name = matchs[3];
+            const map = matchs[1];
             if (npc[npc_name] == null) {
               if (npc_name == '莫莫蒂') {
                 npc_name = '莫莫蒂·莫蒂';
               }
-              const map = matchs[1];
               const pos = matchs[2];
               npc[npc_name] = {
                 desc: `${map}${pos}`,
@@ -110,6 +123,8 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
             }
             // NPC 卡片列表
             npc[npc_name].cards.add(item.id);
+            curTags.add(npc_name);
+            curTags.add(map);
           }
           acqs.push({
             type: 'npc',
@@ -221,7 +236,9 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
     }
     cards.push(item);
     cardRecord[item.id] = item;
+    cardTags[item.id] = [...new Set(pushTag(cardTags[item.id], Array.from(curTags)))]
   });
+
   const sorts = {
     npc: Object.keys(npc).sort((a, b) => {
       const tagA = npc[a].tags[2];
@@ -245,8 +262,18 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
     }
   };
 
+  const record = cardRecord;
+  const cardKeys = Object.keys(record).sort((a, b) => record[a].pos - record[b].pos);
+
   fs.writeFileSync(__dirname + '/ffxiv-9card.json', JSON.stringify(cards));
   fs.writeFileSync(__dirname + '/ffxiv-9card-record.json', JSON.stringify(cardRecord));
+  fs.writeFileSync(__dirname + '/ffxiv-9card-card-keys.json', JSON.stringify(cardKeys));
   fs.writeFileSync(__dirname + '/ffxiv-9card-ext.json', JSON.stringify(ext, (key, value) => value instanceof Set ? [...value]: value));
+  fs.writeFileSync(__dirname + '/ffxiv-9card-tags.json', JSON.stringify(Object.keys(cardTags).map((id) => {
+    return {
+      id,
+      tags: cardTags[id],
+    }
+  })));
 });
 

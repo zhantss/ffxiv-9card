@@ -64,10 +64,36 @@ if (process.env.NODE_ENV !== 'development') {
   Menu.setApplicationMenu(null);
 }
 
+const loadingWindow = () => {
+  const loading = new BrowserWindow({
+    height: 360,
+    width: 360,
+    show: false,
+    useContentSize: true,
+    transparent: false,
+    maximizable: false,
+    frame: false,
+  });
+  loading.loadURL(path.join(__dirname, 'electron/loading.html')).then(() => {
+    loading.show();
+    loading.focus();
+  });
+  Menu.setApplicationMenu(null);
+
+  loading.on('closed', () => {
+    console.log('loading close');
+    loading.destroy();
+  });
+  return loading;
+};
+
 const createWindow = (width, height) => {
+  const loading = loadingWindow();
   const bwin = new BrowserWindow({
     width,
     height,
+    maximizable: false,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -83,11 +109,15 @@ const createWindow = (width, height) => {
   if (process.platform === 'darwin') {
     app.dock.setIcon(path.join(__dirname, 'public/9card.png'));
   }
+  ipc.handle('loadingEnd', () => {
+    loading.close();
+    bwin.show();
+    bwin.focus();
+  });
 };
 
 app.whenReady().then(() => {
   createWindow(1600, 900);
-
   app.on('activate', () => {
     // macOS bug fix
     if (BrowserWindow.getAllWindows().length === 0) {
