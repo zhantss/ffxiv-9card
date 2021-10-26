@@ -15,10 +15,9 @@ import {
   NButton,
   NIcon,
   NSwitch,
-  NCard,
   NImage,
-  NTooltip,
   NNotificationProvider,
+  NPopconfirm,
 } from 'naive-ui';
 import App from '@/App.vue';
 
@@ -47,9 +46,9 @@ if (window.$electron?.api) {
   store.commit('loading', false);
 }
 const naive = create({
-  components: [NNotificationProvider,
+  components: [NNotificationProvider, NPopconfirm,
     NSkeleton, NGrid, NGridItem, NThing, NModal, NPagination, NButtonGroup,
-    NAvatar, NTag, NSpace, NButton, NIcon, NSwitch, NCard, NImage, NTooltip],
+    NAvatar, NTag, NSpace, NButton, NIcon, NSwitch, NImage],
 });
 app.use(naive);
 app.use(router);

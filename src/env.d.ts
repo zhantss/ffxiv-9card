@@ -11,3 +11,12 @@ interface Window {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $electron: any
 }
+
+interface ImportMetaEnv extends Readonly<Record<string, string>> {
+  readonly VITE_APP_NAME: string
+  readonly VITE_APP_ID: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

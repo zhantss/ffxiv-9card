@@ -1,13 +1,14 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "electron:serve": "cross-env NODE_ENV=development electron .",
-    "electron:build": "vite build && electron-builder"
+    "electron:pre": "cross-env NODE_ENV=pre vite build && electron .",
+    "electron:build": "cross-env NODE_ENV=production vite build && electron-builder"
   },
   "build": {
     "appId": "pro.zhantss.ffxiv.9card",
@@ -38,10 +39,13 @@
     }
   },
   "dependencies": {
+    "dexie": "^3.0.3",
+    "electron-store": "^8.0.1",
+    "fuse.js": "^6.4.6",
+    "lodash": "^4.17.21",
     "vue": "^3.2.16",
     "vue-router": "^4.0.12",
-    "vuex": "^4.0.2",
-    "electron-store": "^8.0.1"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.1.0",
@@ -57,6 +61,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-vue": "^7.19.1",
     "naive-ui": "^2.19.9",
+    "pinyin-pro": "^3.3.1",
     "sass": "^1.43.2",
     "typescript": "^4.4.3",
     "vfonts": "^0.1.0",

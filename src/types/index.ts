@@ -15,11 +15,11 @@ export interface Card {
     description: string
   }[]
   // 是否已获得
-  haveIt: boolean
+  haveIt?: boolean
   // 图标
   icon: string
   // 卡面
   surface: string,
   wiki: string,
-  pos: string,
+  pos: number,
 }

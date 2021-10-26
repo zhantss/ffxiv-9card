@@ -1,6 +1,7 @@
 wiki
 config
-utils/ffxiv-9card.json
+utils/*.json
+deprecated
 
 dist
 dist-ssr

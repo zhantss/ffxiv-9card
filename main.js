@@ -76,6 +76,7 @@ const createWindow = (width, height) => {
   const url = process.env.NODE_ENV === 'development' ? 'http://localhost:23001'
     : `file://${path.join(__dirname, 'dist/index.html')}`;
   bwin.loadURL(url);
+  console.log(process.env.NODE_ENV);
   if (process.env.NODE_ENV === 'development') {
     bwin.webContents.openDevTools({ mode: 'detach' });
   }
@@ -85,7 +86,7 @@ const createWindow = (width, height) => {
 };
 
 app.whenReady().then(() => {
-  createWindow(1400, 1200);
+  createWindow(1600, 900);
 
   app.on('activate', () => {
     // macOS bug fix

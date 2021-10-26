@@ -3,12 +3,31 @@ import {
   createStore, Store, useStore as basicUseStore,
 } from 'vuex';
 import { Card } from '@/types';
+import cardRecord from '@/assets/ffxiv-9card-record.json';
+import cardExt from '@/assets/ffxiv-9card-ext.json';
+import UserCardDB from '@/store/db';
 
 export interface State {
   loading: boolean,
-  cardData: Array<Card>,
-  pageCount: number,
-  userData: Record<string, boolean>
+  cardKeys: Array<string>,
+  userCard: Set<string>,
+  cardRecord: Record<string, Card>,
+  cardExt: {
+    menu: Record<string, string>,
+    sorts?: Record<string, Array<string>>,
+    content: Record<string, Record<string, {
+      desc?: string,
+      tags?: Array<string>,
+      details?: {
+        avator?: string,
+        rules?: string[],
+        level?: string,
+      },
+      cards: Array<string>
+    }>>
+  },
+  readonly cardCount: number,
+  userCardCount: number,
 }
 
 export const storeKey: InjectionKey<Store<State>> = Symbol('global state key');
@@ -17,50 +36,80 @@ export function useStore() {
   return basicUseStore(storeKey);
 }
 
+const getCardKeys = () => {
+  const record: Record<string, Card> = cardRecord;
+  return Object.keys(record).sort((a, b) => record[a].pos - record[b].pos);
+};
+
+const cardKeys = getCardKeys();
+const cardCount = cardKeys.length;
+
 export default createStore<State>({
   state: {
     loading: true,
-    cardData: [],
-    pageCount: 1,
-    userData: {},
+    cardKeys,
+    userCard: new Set(),
+    cardRecord,
+    cardExt,
+    cardCount,
+    userCardCount: 0,
   },
   mutations: {
     loading(state, loading) {
-      // console.log(`set loading ${loading}`);
       state.loading = loading;
     },
-    pushCardData(state, cardData: Array<Card>) {
-      state.cardData = Array.from(cardData);
-      state.pageCount = Math.ceil(cardData.length / 30 / 3);
-    },
-    pushUserData(state, userData: Record<string, boolean>) {
-      state.userData = { ...userData };
+    updateUserCard(state, cards: Set<string>) {
+      state.userCard = new Set(cards);
+      state.userCardCount = state.userCard.size;
     },
   },
   actions: {
-    saveUserData({ commit }, userData) {
-      const data = { ...userData };
-      if (window.$electron?.api) {
-        console.log('save user card data');
-        window.$electron.api.setStoreValue('card', data);
-      }
-      commit('pushUserData', data);
+    saveUserCard({ commit }, cards: Set<string>) {
+      UserCardDB.saveUserCard(cards).then(() => {
+        commit('updateUserCard', cards);
+      });
+      // if (window.$electron?.api) {
+      //   console.log('save user card data');
+      //   window.$electron.api.setStoreValue('card', cards);
+      //   commit('updateUserCard', cards);
+      // } else {
+      //   UserCardDB.saveUserCard(cards).then(() => {
+      //     commit('updateUserCard', cards);
+      //   });
+      // }
     },
-    saveUserCard({ state, commit }, { id, value }) {
-      const userData = { ...state.userData };
-      if (window.$electron?.api) {
-        if (value) {
-          window.$electron.api.setStoreValue(`card.${id}`, value);
-        } else {
-          window.$electron.api.deleteStoreValue(`card.${id}`);
-        }
+    saveOneUserCard({ state, dispatch }, { id, getting }) {
+      const cards = new Set(state.userCard);
+      if (getting) {
+        cards.add(id);
+      } else if (cards.has(id)) {
+        cards.delete(id);
       }
-      if (value) {
-        userData[id] = true;
-      } else {
-        delete userData[id];
-      }
-      commit('pushUserData', userData);
+      dispatch('saveUserCard', cards);
     },
+    // saveUserData({ commit }, userData) {
+    //   const data = { ...userData };
+    //   if (window.$electron?.api) {
+    //     console.log('save user card data');
+    //     window.$electron.api.setStoreValue('card', data);
+    //   }
+    //   commit('pushUserData', data);
+    // },
+    // saveUserCard({ state, commit }, { id, value }) {
+    //   const userData = { ...state.userData };
+    //   if (window.$electron?.api) {
+    //     if (value) {
+    //       window.$electron.api.setStoreValue(`card.${id}`, value);
+    //     } else {
+    //       window.$electron.api.deleteStoreValue(`card.${id}`);
+    //     }
+    //   }
+    //   if (value) {
+    //     userData[id] = true;
+    //   } else {
+    //     delete userData[id];
+    //   }
+    //   commit('pushUserData', userData);
+    // },
   },
 });
