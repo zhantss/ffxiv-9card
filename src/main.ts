@@ -28,7 +28,6 @@ import store, { State, storeKey } from './store/index';
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $store: Store<State>
-    $userCard: Record<string, boolean>
   }
 }
 
