@@ -1,10 +1,11 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
+    "build:tsc": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "electron:serve": "cross-env NODE_ENV=development electron .",
     "electron:pre": "cross-env NODE_ENV=pre vite build && electron .",
