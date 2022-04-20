@@ -136,12 +136,12 @@ const columns = createColumns({
     :max-height="maxHeight"
     virtual-scroll
     :columns="columns"
-    :row-props="rowProps"
+    :row-props="(rowProps as any)"
     :row-class-name="rowClasses"
     :data="data" :row-key="(card: Card) => card.pos" />
   <n-data-table v-else
     :columns="columns"
-    :row-props="rowProps"
+    :row-props="(rowProps as any)"
     :row-class-name="rowClasses"
     :data="data" :row-key="(card: Card) => card.pos" />
 </template>

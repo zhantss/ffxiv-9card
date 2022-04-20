@@ -228,7 +228,7 @@ const columns = createColumns({
         <n-layout-content style="height: 82%;" :native-scrollbar="false">
           <n-data-table
             :columns="columns"
-            :row-props="rowProps"
+            :row-props="(rowProps as any)"
             :row-class-name="rowClasses"
             :data="data" :row-key="(card: Card) => card.pos" />
         </n-layout-content>
