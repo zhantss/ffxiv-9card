@@ -1,5 +1,6 @@
 wiki
 config
+logs
 utils/*.json
 deprecated
 

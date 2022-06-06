@@ -6,10 +6,13 @@ import { groupBy, chunk, random } from 'lodash-es';
 import Fuse from 'fuse.js';
 import WarningAmberOutlined from '@vicons/material/WarningAmberOutlined';
 import MenuBookRound from '@vicons/material/MenuBookRound';
+import FileExport from '@vicons/tabler/FileExport';
+import FileUpload from '@vicons/tabler/FileUpload';
 import {
   NLayout, NLayoutHeader, NLayoutContent, NAutoComplete,
 } from 'naive-ui';
 import { useStore } from '@/store';
+import UserCardDB from '@/store/db';
 import CardSolt from '@/components/CardSolt.vue';
 import CardDataTable from '@/components/CardDataTable.vue';
 
@@ -42,7 +45,7 @@ const tag = (id: string) => (id.startsWith('编号外') ? id : `编号 ${id}`);
 const patch = (p: string) => (p.length === 1 ? `${p}.0` : p);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const scrollTo: any = (id: string| undefined) => {
+const scrollTo: any = (id: string | undefined) => {
   if (id && itemRefs.value[id]) {
     itemRefs.value[id].scrollIntoView({ block: 'center' });
     prominent.value = id;
@@ -67,7 +70,7 @@ onMounted(() => {
   userCardState.value = state.userCard;
 });
 
-const chose = (id: string| undefined) => {
+const chose = (id: string | undefined) => {
   hover.value = id != null ? id : cardRecord[cardKeys[0]].id;
   if (isEditModel.value) {
     if (userCardState.value.has(id)) {
@@ -77,7 +80,7 @@ const chose = (id: string| undefined) => {
     }
   }
 };
-const currentChose = (id: string| undefined) => {
+const currentChose = (id: string | undefined) => {
   if (id && cardRecord[id]) {
     if (userCardState.value.has(id)) {
       userCardState.value.delete(id);
@@ -115,6 +118,20 @@ const wiki = (url: string) => {
   }
 };
 
+const exportCardInfo = () => {
+  if (window.$electron?.api) {
+    UserCardDB.getUserCard().then((userCard) => {
+      window.$electron?.api.exportCardInfo(userCard?.cards);
+    });
+  }
+};
+
+const importCardInfo = () => {
+  if (window.$electron?.api) {
+    window.$electron?.api.importCardInfo();
+  }
+};
+
 // const tableHeight = computed(() => document.body.scrollHeight - 180);
 
 const inputTag = ref('');
@@ -124,163 +141,233 @@ const autoOptions = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let result: Array<any> = [];
   if (se && se.length > 0) {
-    result = se.map((s) => {
-      const si = s.item.id;
-      const scard = cardRecord[si];
-      if (scard) {
-        return {
-          label: `[${scard.id}]${scard.name}, ${scard.acqs?.filter((acq) => acq.type === 'npc' || 'battle').map((acq) => acq.description).join(';')}`,
-          value: scard.id,
-        };
-      }
-      return null;
-    }).filter((item) => item != null);
+    result = se
+      .map((s) => {
+        const si = s.item.id;
+        const scard = cardRecord[si];
+        if (scard) {
+          return {
+            label: `[${scard.id}]${scard.name}, ${scard.acqs
+              ?.filter((acq) => acq.type === 'npc' || 'battle')
+              .map((acq) => acq.description)
+              .join(';')}`,
+            value: scard.id,
+          };
+        }
+        return null;
+      })
+      .filter((item) => item != null);
   }
   if (result != null && result.length > 0) {
     return result;
   }
-  return [{
-    label: '什么都没找到, 要不要随便来一张?',
-    value: 'random',
-  }];
+  return [
+    {
+      label: '什么都没找到, 要不要随便来一张?',
+      value: 'random',
+    },
+  ];
 });
-
 </script>
 
 <template>
-    <n-layout-content style="height: 100%;">
-      <n-layout position="absolute" style="height: 100%" :native-scrollbar="false" >
-        <n-layout-header bordered style="padding: 10px 50px 10px 50px;">
+  <n-layout-content style="height: 100%">
+    <n-layout position="absolute" style="height: 100%" :native-scrollbar="false">
+      <n-layout-header bordered style="padding: 10px 50px 10px 50px">
         <n-grid x-gap="12" :cols="5">
           <n-gi span="3">
-              <n-auto-complete clear-after-select :options="autoOptions"
-                style="width: 100%" @select="scrollTo"
-                v-model:value="inputTag" placeholder="寻找心爱的幻卡" />
+            <n-auto-complete
+              clear-after-select
+              :options="autoOptions"
+              style="width: 100%"
+              @select="scrollTo"
+              v-model:value="inputTag"
+              placeholder="寻找心爱的幻卡"
+            />
           </n-gi>
           <n-gi span="1" :offset="1">
             <n-space align="center" justify="end">
               <div class="card-completion">{{ completion }}</div>
               <n-button type="error" @click="openLibrary = true">我的幻卡库</n-button>
-              <n-modal v-model:show="openLibrary" style="width: 80%" preset="card">
-                  <n-space justify="center">
-                    <div class="card-list">
-                      <n-space style="margin-bottom: 10px" align="baseline" justify="space-between">
-                        <n-switch v-model:value="isEditModel"
-                          @update:value="updateUserCard" size="large">
-                          <template #checked>编辑模式</template>
-                          <template #unchecked>编辑模式</template>
-                        </n-switch>
-                        <n-popconfirm v-model:show="showCleanConfirm">
-                          <template #trigger>
-                            <n-button
-                              :disabled="!isEditModel"
-                              size="small" icon-placement="right" type="error">
-                              <template #icon>
-                                <n-icon>
-                                  <warning-amber-outlined />
-                                </n-icon>
-                              </template>
-                                清空
-                            </n-button>
-                          </template>
-                            <span style="font-size: 16px">确认清空吗?</span>
-                          <template #action>
-                            <n-button type="error" size="small" @click="cleanCard">确认</n-button>
-                          </template>
-                        </n-popconfirm>
-                      </n-space>
-                      <n-pagination v-model:page="page" :page-count="sum" :page-slot="5" />
-                      <n-grid :x-gap="4" :cols="5">
-                        <n-gi span="1" v-for="(id, index) in cards[page - 1]" :key="index">
-                          <CardSolt
-                            :has="isEditModel && !has(id)"
-                            :card="cardRecord[id]" :size="44" @chose="chose" />
-                        </n-gi>
-                      </n-grid>
-                    </div>
-                    <div class="card-detail">
-                      <div class="card-info">
-                        <div class="card-surface">
-                          <n-tag
-                            size="small" type="info">{{ `${tag(card(hover).id)}` }}</n-tag>
-                          <n-avatar
-                              :size="26"
-                              :style="{
-                                '--color': 'rgba(255,255,255,0)',
-                              }"
-                              :class="'rarity'"
-                              :src="'./card/rarity' + card(hover).rarity + '.png'" />
-                          <n-image :src="`./ffxiv/surface/${card(hover).surface}`" />
-                          <div class="card-values">
-                            <span :class="`card-value top
-                              ${ card(hover).values?.[0] === 'A' ? 'small': ''}`">
-                              {{ card(hover).values?.[0] }}
-                            </span>
-                            <span :class="`card-value right
-                              ${ card(hover).values?.[1] === 'A' ? 'small': ''}`">
-                              {{ card(hover).values?.[1] }}
-                            </span>
-                            <span :class="`card-value bottom
-                              ${ card(hover).values?.[2] === 'A' ? 'small': ''}`">
-                              {{ card(hover).values?.[2] }}
-                            </span>
-                            <span :class="`card-value left
-                              ${ card(hover).values?.[3] === 'A' ? 'small': ''}`">
-                              {{ card(hover).values?.[3] }}
-                            </span>
-                          </div>
-                        </div>
-                        <div class="card-ext">
-                          <n-space class="card-tags" align="end">
-                            <n-button
-                              class="wiki-btn" size="small"
-                              type="info" dashed @click="wiki(card(hover).wiki)">
-                            <template #icon>
-                              <n-icon>
-                                <menu-book-round />
-                              </n-icon>
-                            </template>
-                            {{ card(hover).name }}
-                          </n-button>
-                            <n-tag class="patch-tag" round
-                              type="success">{{ `${patch(card(hover).patch)}` }}</n-tag>
-                            <n-tag v-if="card(hover).org != 'none'"
-                              class="org-tag" type="success">{{ `${card(hover).org}` }}</n-tag>
-                          </n-space>
-                        </div>
-                      </div>
-                      <div class="card-acqs">
-                          <div class="acq" v-for="(acq, i) in (card(hover).acqs)" :key="i">
-                            <n-avatar
-                              :size="18"
-                              :style="{
-                                '--color': 'rgba(255,255,255,0)',
-                              }"
-                              :class="'acq-icon'"
-                              :src="'./card/' + acq.type + '.png'" />
-                              <span class="acq-desc">{{ acq.description }}</span>
-                          </div>
-                      </div>
-                    </div>
-                  </n-space>
-              </n-modal>
             </n-space>
           </n-gi>
         </n-grid>
-        </n-layout-header>
-        <n-layout position="absolute" style="top: 50px">
-          <n-layout-content position="absolute"
-            style="padding: 0 50px 0 50px" :native-scrollbar="false">
-            <!-- <CardDataTable
+        <n-modal v-model:show="openLibrary" style="width: 80%" preset="card">
+          <n-space justify="center">
+            <div class="card-list">
+              <n-space
+                style="margin-bottom: 10px"
+                align="baseline"
+                justify="space-between"
+              >
+                <n-switch
+                  v-model:value="isEditModel"
+                  @update:value="updateUserCard"
+                  size="large"
+                >
+                  <template #checked>编辑模式</template>
+                  <template #unchecked>编辑模式</template>
+                </n-switch>
+                <n-popconfirm v-model:show="showCleanConfirm">
+                  <template #trigger>
+                    <n-button
+                      :disabled="!isEditModel"
+                      size="small"
+                      icon-placement="right"
+                      type="error"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <warning-amber-outlined />
+                        </n-icon>
+                      </template>
+                      清空
+                    </n-button>
+                  </template>
+                  <span style="font-size: 16px">确认清空吗?</span>
+                  <template #action>
+                    <n-button type="error" size="small" @click="cleanCard">确认</n-button>
+                  </template>
+                </n-popconfirm>
+              </n-space>
+              <n-pagination v-model:page="page" :page-count="sum" :page-slot="5" />
+              <n-grid :x-gap="4" :cols="5">
+                <n-gi span="1" v-for="(id, index) in cards[page - 1]" :key="index">
+                  <CardSolt
+                    :has="isEditModel && !has(id)"
+                    :card="cardRecord[id]"
+                    :size="44"
+                    @chose="chose"
+                  />
+                </n-gi>
+              </n-grid>
+            </div>
+            <div class="card-detail">
+              <div class="card-info">
+                <div class="card-surface">
+                  <n-tag size="small" type="info">{{ `${tag(card(hover).id)}` }}</n-tag>
+                  <n-avatar
+                    :size="26"
+                    :style="{
+                      '--color': 'rgba(255,255,255,0)',
+                    }"
+                    :class="'rarity'"
+                    :src="'./card/rarity' + card(hover).rarity + '.png'"
+                  />
+                  <n-image :src="`./ffxiv/surface/${card(hover).surface}`" />
+                  <div class="card-values">
+                    <span
+                      :class="`card-value top
+                              ${card(hover).values?.[0] === 'A' ? 'small' : ''}`"
+                    >
+                      {{ card(hover).values?.[0] }}
+                    </span>
+                    <span
+                      :class="`card-value right
+                              ${card(hover).values?.[1] === 'A' ? 'small' : ''}`"
+                    >
+                      {{ card(hover).values?.[1] }}
+                    </span>
+                    <span
+                      :class="`card-value bottom
+                              ${card(hover).values?.[2] === 'A' ? 'small' : ''}`"
+                    >
+                      {{ card(hover).values?.[2] }}
+                    </span>
+                    <span
+                      :class="`card-value left
+                              ${card(hover).values?.[3] === 'A' ? 'small' : ''}`"
+                    >
+                      {{ card(hover).values?.[3] }}
+                    </span>
+                  </div>
+                </div>
+                <div class="card-ext">
+                  <n-space class="card-tags" align="end">
+                    <n-button
+                      class="wiki-btn"
+                      size="small"
+                      type="info"
+                      dashed
+                      @click="wiki(card(hover).wiki)"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <menu-book-round />
+                        </n-icon>
+                      </template>
+                      {{ card(hover).name }}
+                    </n-button>
+                    <n-tag class="patch-tag" round type="success">{{
+                      `${patch(card(hover).patch)}`
+                    }}</n-tag>
+                    <n-tag
+                      v-if="card(hover).org != 'none'"
+                      class="org-tag"
+                      type="success"
+                      >{{ `${card(hover).org}` }}</n-tag
+                    >
+                  </n-space>
+                </div>
+              </div>
+              <div class="card-acqs">
+                <div class="acq" v-for="(acq, i) in card(hover).acqs" :key="i">
+                  <n-avatar
+                    :size="18"
+                    :style="{
+                      '--color': 'rgba(255,255,255,0)',
+                    }"
+                    :class="'acq-icon'"
+                    :src="'./card/' + acq.type + '.png'"
+                  />
+                  <span class="acq-desc">{{ acq.description }}</span>
+                </div>
+              </div>
+            </div>
+          </n-space>
+          <template #footer>
+            <n-space justify="end">
+              <n-button type="warning" strong secondary @click="importCardInfo">
+                <template #icon>
+                  <n-icon>
+                    <file-upload />
+                  </n-icon>
+                </template>
+                从文件恢复
+              </n-button>
+              <n-button type="info" @click="exportCardInfo">
+                <template #icon>
+                  <n-icon>
+                    <file-export />
+                  </n-icon>
+                </template>
+                备份到本地
+              </n-button>
+            </n-space>
+          </template>
+        </n-modal>
+      </n-layout-header>
+      <n-layout position="absolute" style="top: 50px">
+        <n-layout-content
+          position="absolute"
+          style="padding: 0 50px 0 50px"
+          :native-scrollbar="false"
+        >
+          <!-- <CardDataTable
               :set-item-ref="setItemRef" :has="has" :max-height="tableHeight" @chose="currentChose"
               :prominent="prominent" :card-keys="cardKeys" :card-record="cardRecord"  /> -->
-            <CardDataTable
-              :set-item-ref="setItemRef" :has="has" @chose="currentChose"
-              :prominent="prominent" :card-keys="cardKeys" :card-record="cardRecord"  />
-          </n-layout-content>
-        </n-layout>
+          <CardDataTable
+            :set-item-ref="setItemRef"
+            :has="has"
+            @chose="currentChose"
+            :prominent="prominent"
+            :card-keys="cardKeys"
+            :card-record="cardRecord"
+          />
+        </n-layout-content>
       </n-layout>
-    </n-layout-content>
+    </n-layout>
+  </n-layout-content>
 </template>
 
 <style lang="scss">

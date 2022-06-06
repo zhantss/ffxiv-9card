@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, h } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-import { NIcon, NMenu, NLayoutHeader } from 'naive-ui';
+import {
+  NIcon, NMenu, NLayoutHeader,
+} from 'naive-ui';
 import { AllInclusiveRound } from '@vicons/material';
 import { useStore } from '@/store';
 
@@ -37,16 +39,22 @@ keys.forEach((key) => {
     ),
   });
 });
+
 </script>
 
 <template>
   <n-layout-header bordered>
-    <n-menu
+    <n-space class="app-header" justify="space-between">
+      <n-menu
       mode="horizontal"
       :options="options"
       :value="ext" />
+    </n-space>
   </n-layout-header>
 </template>
 
 <style lang="scss">
+.app-header {
+  padding: 0 50px;
+}
 </style>

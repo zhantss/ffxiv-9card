@@ -15,7 +15,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('$electron', {
-  ipcRenderer,
+  // ipcRenderer,
   api: {
     on: (channel, callback) => ipcRenderer.on(channel, (event, argv) => callback(event, argv)),
     openUrl: async (url) => {
@@ -23,10 +23,11 @@ contextBridge.exposeInMainWorld('$electron', {
       ipcRenderer.invoke('openUrl', url);
     },
     loadingEnd: async () => ipcRenderer.invoke('loadingEnd'),
-    getStoreValue: async (key) => ipcRenderer.invoke('getStoreValue', key),
-    setStoreValue: async (key, data) => ipcRenderer.invoke('setStoreValue', key, data),
-    deleteStoreValue: async (key) => ipcRenderer.invoke('deleteStoreValue', key),
-    exportCardInfo: async () => ipcRenderer.invoke('exportCardInfo'),
+    // getStoreValue: async (key) => ipcRenderer.invoke('getStoreValue', key),
+    // setStoreValue: async (key, data) => ipcRenderer.invoke('setStoreValue', key, data),
+    // deleteStoreValue: async (key) => ipcRenderer.invoke('deleteStoreValue', key),
+    exportCardInfo: async (data) => ipcRenderer.invoke('exportCardInfo', data),
     importCardInfo: async () => ipcRenderer.invoke('importCardInfo'),
+    receiveImportCardInfo: (callback) => ipcRenderer.on('importCardInfo', (event, argv) => callback(event, argv)),
   },
 });

@@ -24,14 +24,16 @@ export default defineComponent({
 
 <template>
   <n-notification-provider>
-    <n-loading-bar-provider>
-      <router-view v-slot="{ Component }" name="LoadingMask">
-          <transition name="fade">
-            <component v-if="loading" :is="Component" />
-          </transition>
-        </router-view>
-      <router-view @loading="setLoading"></router-view>
-    </n-loading-bar-provider>
+    <n-dialog-provider>
+      <n-loading-bar-provider>
+        <router-view v-slot="{ Component }" name="LoadingMask">
+            <transition name="fade">
+              <component v-if="loading" :is="Component" />
+            </transition>
+          </router-view>
+        <router-view @loading="setLoading"></router-view>
+      </n-loading-bar-provider>
+    </n-dialog-provider>
   </n-notification-provider>
 </template>
 
