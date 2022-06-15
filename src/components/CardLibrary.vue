@@ -51,7 +51,7 @@ const scrollTo: any = (id: string | undefined) => {
     prominent.value = id;
   } else if (id === 'random') {
     const notGetting = cardKeys.filter((cardId) => !userCardState.value.has(cardId));
-    const rd = notGetting[random(0, cardKeys.length - 1)];
+    const rd = notGetting[random(0, notGetting.length - 1)];
     itemRefs.value[rd].scrollIntoView({ block: 'center' });
     prominent.value = rd;
   }
