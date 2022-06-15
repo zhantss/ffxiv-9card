@@ -215,6 +215,7 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
             type: 'battle',
             description: cacq,
           })
+          curTags.add(cacq);
         }
         item.acqs = acqs;
       }
