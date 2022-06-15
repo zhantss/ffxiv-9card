@@ -3,6 +3,8 @@ config
 logs
 utils/*.json
 deprecated
+stats.html
+
 
 dist
 dist-ssr
