@@ -1,6 +1,6 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
@@ -37,7 +37,7 @@
     },
     "directories": {
       "buildResources": "assets",
-      "output": "dist/electron"
+      "output": "target/electron"
     }
   },
   "dependencies": {

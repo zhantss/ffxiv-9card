@@ -28,7 +28,6 @@ export default defineComponent({
         this.notifyError(message);
       });
       window.$electron?.api.on('importUserData', (event: unknown, cards: Set<string>) => {
-        // TODO 从文件恢复幻卡库
         this.importCardInfoDialog(new Set<string>(cards));
       });
       window.$electron?.api.loadingEnd();

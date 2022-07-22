@@ -40,6 +40,7 @@ const prominent = ref('none');
 const thisRef: Record<string, HTMLElement> = {};
 const itemRefs = ref(thisRef);
 const openLibrary = ref(false);
+const onlyNotHaving = ref(false);
 const card = (id: string) => cardRecord[id];
 const tag = (id: string) => (id.startsWith('编号外') ? id : `编号 ${id}`);
 const patch = (p: string) => (p.length === 1 ? `${p}.0` : p);
@@ -174,16 +175,26 @@ const autoOptions = computed(() => {
   <n-layout-content style="height: 100%">
     <n-layout position="absolute" style="height: 100%" :native-scrollbar="false">
       <n-layout-header bordered style="padding: 10px 50px 10px 50px">
-        <n-grid x-gap="12" :cols="5">
+        <n-grid x-gap="12" :cols="6">
           <n-gi span="3">
             <n-auto-complete
               clear-after-select
               :options="autoOptions"
               style="width: 100%"
               @select="scrollTo"
+              @focus="() => { onlyNotHaving = false }"
               v-model:value="inputTag"
               placeholder="寻找心爱的幻卡"
             />
+          </n-gi>
+          <n-gi span="1">
+            <n-switch
+              v-model:value="onlyNotHaving"
+              size="large"
+            >
+              <template #checked>只看未获得</template>
+              <template #unchecked>只看未获得</template>
+            </n-switch>
           </n-gi>
           <n-gi span="1" :offset="1">
             <n-space align="center" justify="end">
@@ -361,6 +372,7 @@ const autoOptions = computed(() => {
             :has="has"
             @chose="currentChose"
             :prominent="prominent"
+            :only-not-having="onlyNotHaving"
             :card-keys="cardKeys"
             :card-record="cardRecord"
           />

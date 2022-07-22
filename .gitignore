@@ -4,6 +4,7 @@ logs
 utils/*.json
 deprecated
 stats.html
+target
 
 
 dist

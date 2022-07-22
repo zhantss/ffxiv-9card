@@ -20,6 +20,7 @@ interface Props {
   cardRecord: Record<string, Card>,
   cardKeys: Array<string>,
   maxHeight?: number,
+  onlyNotHaving?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -31,10 +32,14 @@ const rowProps = (row: Card) => ({
   ref: props.setItemRef,
 });
 const rowClasses = (row: Card) => {
-  if (row.id === props.prominent) {
-    return 'prominent';
+  let clz = '';
+  if (props.onlyNotHaving && props.has(row.id)) {
+    clz += 'not-visable ';
   }
-  return '';
+  if (row.id === props.prominent) {
+    clz += 'prominent ';
+  }
+  return clz;
 };
 
 interface ColumnsOptions {
@@ -145,3 +150,9 @@ const columns = createColumns({
     :row-class-name="rowClasses"
     :data="data" :row-key="(card: Card) => card.pos" />
 </template>
+
+<style lang="scss">
+.not-visable {
+  display: none;
+}
+</style>
