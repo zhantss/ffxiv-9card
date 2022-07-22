@@ -189,8 +189,10 @@ const autoOptions = computed(() => {
           </n-gi>
           <n-gi span="1">
             <n-switch
+              :round="false"
               v-model:value="onlyNotHaving"
               size="large"
+              style="height: 100%"
             >
               <template #checked>只看未获得</template>
               <template #unchecked>只看未获得</template>
