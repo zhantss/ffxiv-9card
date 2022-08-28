@@ -263,6 +263,7 @@ const autoOptions = computed(() => {
                     :size="26"
                     :style="{
                       '--color': 'rgba(255,255,255,0)',
+                      backgroundColor: 'rgba(255,255,255,0)'
                     }"
                     :class="'rarity'"
                     :src="'./card/rarity' + card(hover).rarity + '.png'"
@@ -329,6 +330,7 @@ const autoOptions = computed(() => {
                     :size="18"
                     :style="{
                       '--color': 'rgba(255,255,255,0)',
+                      backgroundColor: 'rgba(255,255,255,0)'
                     }"
                     :class="'acq-icon'"
                     :src="'./card/' + acq.type + '.png'"

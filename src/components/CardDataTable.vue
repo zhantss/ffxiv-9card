@@ -7,7 +7,7 @@ import {
 } from 'naive-ui';
 import CardSolt from '@/components/CardSolt.vue';
 import {
-  CardTagId, CardTagPatch, CardTagOrg, CardWiki,
+  CardTagId, CardTagPatch, CardTagOrg, CardWiki, BattleInfo,
 } from '@/components/CardTag';
 import type { Card } from '@/types';
 
@@ -116,7 +116,12 @@ const createColumns = ({ wiki }: ColumnsOptions) => [
           vertical: true,
         },
         {
-          default: () => card.acqs?.map((acq) => h('span', {}, acq.description)),
+          default: () => card.acqs?.map((acq) => {
+            if (acq.battle) {
+              return h(BattleInfo, acq.battle);
+            }
+            return h('span', {}, acq.description);
+          }),
         },
       );
     },

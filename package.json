@@ -1,6 +1,6 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "main": "main.js",
   "scripts": {
     "dev": "vite",

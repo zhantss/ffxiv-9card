@@ -10,7 +10,7 @@ import {
 import { useStore } from '@/store';
 import CardSolt from '@/components/CardSolt.vue';
 import {
-  CardTagId, CardTagPatch, CardTagOrg, CardWiki,
+  CardTagId, CardTagPatch, CardTagOrg, CardWiki, TaskWiki,
 } from '@/components/CardTag';
 import type { Card } from '@/types';
 
@@ -110,6 +110,14 @@ const rowClasses = (row: Card) => {
   return '';
 };
 
+const openUrl = (url: string) => {
+  if (window.$electron?.api) {
+    window.$electron?.api.openUrl(url);
+  } else {
+    window.open(url);
+  }
+};
+
 const createColumns = ({ wiki }: ColumnsOptions) => [
   {
     title: '',
@@ -181,13 +189,7 @@ const createColumns = ({ wiki }: ColumnsOptions) => [
 
 const data = computed(() => instance.value.cards.map((card) => cardRecord[card]));
 const columns = createColumns({
-  wiki: (url: string) => {
-    if (window.$electron?.api) {
-      window.$electron?.api.openUrl(url);
-    } else {
-      window.open(url);
-    }
-  },
+  wiki: openUrl,
 });
 
 </script>
@@ -216,6 +218,14 @@ const columns = createColumns({
                   v-for="(rule, i) in aboutDetails.rules" :key="i">
                   {{ rule }}
                 </n-tag>
+              </div>
+              <div class="about-prep" v-if="aboutDetails?.prep">
+                <n-space align="center">
+                  <TaskWiki
+                    v-for="(task, i) in aboutDetails.prep" :key="i"
+                    :task-type="task.type" :task-name="task.name"
+                    @open-wiki="openUrl"/>
+                </n-space>
               </div>
             </n-space>
             <div class="card-scroll">

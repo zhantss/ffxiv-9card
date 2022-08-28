@@ -27,7 +27,13 @@ export interface State {
       details?: {
         avator?: string,
         rules?: string[],
-        level?: string,
+        notAchiev?: boolean,
+        pos?: string,
+        prep?: {
+          conj?: string,
+          type: string,
+          name: string
+        }[]
       },
       cards: Array<string>
     }>>

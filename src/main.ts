@@ -20,6 +20,7 @@ import {
   NDialogProvider,
   NPopconfirm,
   NLoadingBarProvider,
+  NPopover,
 } from 'naive-ui';
 import App from '@/App.vue';
 
@@ -45,7 +46,7 @@ const app = createApp(App);
 const naive = create({
   components: [NNotificationProvider, NDialogProvider, NLoadingBarProvider, NPopconfirm,
     NSkeleton, NGrid, NGridItem, NThing, NModal, NPagination, NButtonGroup,
-    NAvatar, NTag, NSpace, NButton, NIcon, NSwitch, NImage],
+    NAvatar, NTag, NSpace, NButton, NIcon, NSwitch, NImage, NPopover],
 });
 app.use(naive);
 app.use(router);

@@ -12,7 +12,16 @@ export interface Card {
   // 获取方式
   acqs?: {
     type: string,
-    description: string
+    description: string,
+    battle?: {
+      name: string;
+      pos: string;
+      prep?: {
+        conj?: string;
+        type: string;
+        name: string;
+      }[];
+    }
   }[]
   // 是否已获得
   haveIt?: boolean

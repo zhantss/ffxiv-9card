@@ -1,12 +1,16 @@
 /* eslint-disable */
 const fs = require('fs');
 const { pinyin } = require('pinyin-pro');
-const cardNpc = require('../wiki/ffxiv-9card-npc.json')
-
+const cardNpc = require('../wiki/ffxiv-9card-wiki-npc.json');
+const npcAppend = require('../wiki/ffxiv-9card-npc-append.json');
 const npcInfo = {};
-cardNpc.forEach(npc => {
-  npcInfo[npc.name] = npc;
+
+Object.keys(cardNpc).forEach(name => {
+  if (npcAppend[name]) {
+    npcInfo[name] = Object.assign({}, cardNpc[name], npcAppend[name])
+  }
 })
+
 const avators = fs.readdirSync(__dirname + "/../public/ffxiv/npc")
 
 function fillId(id) {
@@ -67,6 +71,8 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
   };
   const org = {};
   items.forEach(item => {
+    // origin id
+    const origin_id = item.id;
     // id & pos
     if (item.id.length <= 3) {
       item.pos = Number.parseInt(item.id);
@@ -97,14 +103,15 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
         if (cacq.endsWith('对战')) {
           // NPC 信息
           const matchs = cacq.match(/与(\S+)(.+?)的(\S+)进行幻卡对战/);
+          let battle = null;
           if (matchs.length == 4) {
             let npc_name = matchs[3];
             const map = matchs[1];
+            const pos = matchs[2];
             if (npc[npc_name] == null) {
               if (npc_name == '莫莫蒂') {
                 npc_name = '莫莫蒂·莫蒂';
               }
-              const pos = matchs[2];
               npc[npc_name] = {
                 desc: `${map}${pos}`,
                 tags: createTags([npc_name, map]),
@@ -113,23 +120,41 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
               if (npcInfo[npc_name]) {
                 const cur_npc = npcInfo[npc_name];
                 const avator = avators.indexOf(cur_npc.avator) != -1 ? cur_npc.avator : null;
-                const rules = cur_npc.rules.length >= 1 ? cur_npc.rules[0] : null;
-                const level = cur_npc.rules.length >= 2 ? cur_npc.rules[1] : null;
-                npc[npc_name].details = {}
+                const rules = cur_npc.rules;
+                const notAchiev = cur_npc["not-achiev"]
+                // const level = cur_npc.rules.length >= 2 ? cur_npc.rules[1] : null;
+                npc[npc_name].details = {
+                  pos: cur_npc.pos,
+                  prep: cur_npc.prep
+                }
                 if (avator) npc[npc_name].details.avator = avator;
-                if (rules) npc[npc_name].details.rules = rules.split(',');
-                if (level) npc[npc_name].details.level = level;
+                if (rules) npc[npc_name].details.rules = rules;
+                // if (level) npc[npc_name].details.level = level;
+                if (notAchiev) npc[npc_name].details.notAchiev = true;
               }
             }
             // NPC 卡片列表
             npc[npc_name].cards.add(item.id);
             curTags.add(npc_name);
             curTags.add(map);
+            battle = {
+              pos: npc[npc_name].details.pos,
+              name: npc_name,
+              prep: npc[npc_name].details.prep
+            }
           }
-          acqs.push({
-            type: 'npc',
-            description: cacq,
-          })
+          if (battle != null) {
+            acqs.push({
+              type: 'npc',
+              description: cacq,
+              battle: battle
+            })
+          } else {
+            acqs.push({
+              type: 'npc',
+              description: cacq,
+            })
+          }
         } else if (/(\S*)九宫幻卡(\S*)包/.test(cacq)) {
           // 金蝶卡包
           const triad_name = cacq;
@@ -220,10 +245,17 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
         item.acqs = acqs;
       }
     } else {
-      item.acqs = [{
-        type: 'init',
-        description: "初始卡组"
-      }]
+      if (!origin_id.startsWith("编号外") && origin_id <= 20) {
+        item.acqs = [{
+          type: 'init',
+          description: "初始卡组"
+        }]
+      } else {
+        item.acqs = [{
+          type: "unknow",
+          description: ""
+        }]
+      }
     }
     item.values = item.values.map(value => Number.parseInt(value, 10) > 9 ? 'A' : value);
     delete item['haveIt'];
