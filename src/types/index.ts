@@ -34,6 +34,6 @@ export interface Card {
   // 最低代币价值
   token?: {
     type: string,
-    value: string,
+    value: number,
   }
 }

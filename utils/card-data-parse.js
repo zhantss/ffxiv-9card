@@ -289,12 +289,15 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
         let reg = new RegExp("(.+?)(\\d+)" + name + "购买");
         const matchs = acq.description.match(reg);
         if (matchs && matchs.length == 3 && matchs[2] < minToken) {
-          minToken = matchs[2];
+          const currentToken = Number.parseInt(matchs[2]);
+          if (currentToken < minToken) {
+            minToken = matchs[2];
+          }
         }
       })
       record.token = {
         type: type,
-        value: minToken
+        value: Number.parseInt(minToken)
       }
       cardRecord[id] = record;
     })
