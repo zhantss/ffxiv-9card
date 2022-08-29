@@ -156,7 +156,7 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
             })
           }
         } else if (/(\S*)九宫幻卡(\S*)包/.test(cacq)) {
-          // 金蝶卡包
+          // 卡包
           const triad_name = cacq;
           if (traid[triad_name] == null) {
             traid[triad_name] = {
@@ -271,6 +271,34 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
     cardRecord[item.id] = item;
     cardTags[item.id] = [...new Set(pushTag(cardTags[item.id], Array.from(curTags)))]
   });
+
+  Object.keys(token).forEach(name => {
+    let type = "token";
+    switch(name) {
+      case "金碟币": type = "mgp"; break;
+      case "天穹街振兴票": type = "nige-ticket"; break;
+      case "双色宝石": type = "bi-gem"; break;
+      case "博兹雅晶簇": type = "bzy-crystal"; break;
+      case "同盟徽章": type = "alliance-badge"; break;
+      default: type = "token";
+    }
+    token[name].cards.forEach(id => {
+      const record = cardRecord[id];
+      let minToken = record.token ? record.token.value : Number.MAX_SAFE_INTEGER;
+      record.acqs.forEach(acq => {
+        let reg = new RegExp("(.+?)(\\d+)" + name + "购买");
+        const matchs = acq.description.match(reg);
+        if (matchs && matchs.length == 3 && matchs[2] < minToken) {
+          minToken = matchs[2];
+        }
+      })
+      record.token = {
+        type: type,
+        value: minToken
+      }
+      cardRecord[id] = record;
+    })
+  })
 
   const sorts = {
     npc: Object.keys(npc).sort((a, b) => {

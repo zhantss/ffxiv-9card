@@ -31,4 +31,9 @@ export interface Card {
   surface: string,
   wiki: string,
   pos: number,
+  // 最低代币价值
+  token?: {
+    type: string,
+    value: string,
+  }
 }
