@@ -40,7 +40,7 @@ const openMap = (id: number, x: string, y: string) => {
 </script>
 
 <template>
-  <span>
+  <span class="card-acq">
     与
     <n-button class="map-name" text @click="openMap(pos.id, pos.x, pos.y)">{{ pos.desc }}</n-button>
     的
@@ -64,16 +64,34 @@ const openMap = (id: number, x: string, y: string) => {
 </template>
 
 <style scoped lang="scss">
+.card-acq {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
 .map-name {
   color: #77d1ff;
+  margin-right: 5px;
 }
 .npc-name {
   color: #77d1ff;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 .npc-prep::after {
   content: "!";
   color: brown;
   font-weight:bold;
   margin-left: 2px;
+}
+.map-name::before {
+  content: "";
+  background: url('../card/map-marked.png') no-repeat 0 0;
+  background-size: cover;
+  display: inline-block;
+  height: 14px;
+  width: 14px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 </style>

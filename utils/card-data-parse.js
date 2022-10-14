@@ -112,6 +112,9 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
     '同盟徽章': {
       cards: new Set()
     },
+    '星钴币': {
+      cards: new Set()
+    }
   };
   const org = {};
   items.forEach(item => {
@@ -268,6 +271,12 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
             type: 'alliance-badge',
             description: cacq,
           })
+        } else if (cacq.indexOf('星钴币') != -1) {
+          token['星钴币'].cards.add(item.id);
+          acqs.push({
+            type: 'elephant-coin',
+            description: cacq,
+          })
         } else if (cacq.indexOf('幸福兔') != -1) {
           acqs.push({
             type: 'other',
@@ -325,24 +334,58 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
       case "双色宝石": type = "bi-gem"; break;
       case "博兹雅晶簇": type = "bzy-crystal"; break;
       case "同盟徽章": type = "alliance-badge"; break;
+      case "星钴币": type = "elephant-coin"; break;
       default: type = "token";
     }
     token[name].cards.forEach(id => {
       const record = cardRecord[id];
-      let minToken = record.token ? record.token.value : Number.MAX_SAFE_INTEGER;
+      // let minToken = record.token ? record.token.value : Number.MAX_SAFE_INTEGER;
+      const extAcqs = [];
       record.acqs.forEach(acq => {
-        let reg = new RegExp("(.+?)(\\d+)" + name + "购买");
+        // let reg = new RegExp("(.+?)(\\d+)" + name + "购买");
+        let reg = new RegExp("(\\S+) \\(X: (.+?), Y: (.+?)\\)(.+?)(\\d+)" + name + "购买");
         const matchs = acq.description.match(reg);
-        if (matchs && matchs.length == 3 && matchs[2] < minToken) {
-          const currentToken = Number.parseInt(matchs[2]);
-          if (currentToken < minToken) {
-            minToken = matchs[2];
+        // if (matchs && matchs.length == 3 && matchs[2] < minToken) {
+        //   const currentToken = Number.parseInt(matchs[2]);
+        //   if (currentToken < minToken) {
+        //     minToken = matchs[2];
+        //   }
+        // }
+        if (matchs && matchs.length == 6) {
+          let regionOri = matchs[1];
+          let regionName = matchs[1];
+          if (regionName == '金碟游乐场') {
+            regionName = `金碟游乐场 - 金碟游乐场`;
+          } else if (regionName == '乌尔达哈来生回廊') {
+            regionName = '乌尔达哈来生回廊 - 来生回廊'
           }
+          if (regionMapping[regionName] != null) {
+            extAcqs.push({
+              ...acq,
+              token: {
+                type: type,
+                name: name,
+                pos: {
+                  id: regionMapping[regionName],
+                  x: matchs[2],
+                  y: matchs[3],
+                  desc: `${regionOri} (X: ${matchs[2]}, Y: ${matchs[3]})`
+                },
+                npc: matchs[4],
+                value: matchs[5]
+              }
+           })
+          } else {
+            console.log(regionName)
+          }
+        } else {
+          extAcqs.push(acq)
         }
       })
+      record.acqs = extAcqs;
       record.token = {
         type: type,
-        value: Number.parseInt(minToken)
+        value: 0,
       }
       cardRecord[id] = record;
     })

@@ -23,6 +23,7 @@ process.on('uncaughtException', (error) => {
 
 bootstrap();
 
+let mainWindow = null;
 let eorzeaMapWindow = null;
 
 ipc.handle('openUrl', (event, url) => {
@@ -32,7 +33,18 @@ ipc.handle('openUrl', (event, url) => {
 ipc.handle('openMap', (event, id, x, y) => {
   if (eorzeaMapWindow == null) return;
   if (eorzeaMapWindow.isDestroyed()) {
-    eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`);
+    if (mainWindow != null) {
+      const {
+        x: mainX, y: mainY, width: mainWidth, height: mainHeight,
+      } = mainWindow.getBounds();
+      eorzeaMapWindow = initEorzeaMapWindow(
+        `${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`, mainX + mainWidth, mainY + mainHeight,
+      );
+    } else {
+      eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`);
+    }
+    eorzeaMapWindow.show();
+    eorzeaMapWindow.focus();
   } else {
     eorzeaMapWindow.loadURL(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`).then(() => {
       eorzeaMapWindow.show();
@@ -153,10 +165,11 @@ const createWindow = (width, height) => {
       // eorzeaMapWindow.show();
     }
   });
+  return bwin;
 };
 
 app.whenReady().then(() => {
-  createWindow(1600, 900);
+  mainWindow = createWindow(1600, 900);
   app.on('activate', () => {
     // macOS bug fix
     if (BrowserWindow.getAllWindows().length === 0) {

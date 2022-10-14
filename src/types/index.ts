@@ -26,6 +26,18 @@ export interface Card {
         type: string;
         name: string;
       }[];
+    },
+    token?: {
+      name: string,
+      type: string,
+      pos: {
+        id: number,
+        x: string,
+        y: string,
+        desc: string,
+      },
+      npc: string,
+      value: string
     }
   }[]
   // 是否已获得

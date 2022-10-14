@@ -10,7 +10,7 @@ import {
 import { useStore } from '@/store';
 import CardSolt from '@/components/CardSolt.vue';
 import {
-  CardTagId, CardTagPatch, CardTagOrg, CardWiki, TaskWiki,
+  CardTagId, CardTagPatch, CardTagOrg, CardWiki, TaskWiki, BattleInfo, TokenInfo,
 } from '@/components/CardTag';
 import type { Card } from '@/types';
 
@@ -180,7 +180,15 @@ const createColumns = ({ wiki }: ColumnsOptions) => [
           vertical: true,
         },
         {
-          default: () => card.acqs?.map((acq) => h('span', {}, acq.description)),
+          default: () => card.acqs?.map((acq) => {
+            if (acq.battle) {
+              return h(BattleInfo, acq.battle);
+            }
+            if (acq.token) {
+              return h(TokenInfo, acq.token);
+            }
+            return h('span', {}, acq.description);
+          }),
         },
       );
     },
