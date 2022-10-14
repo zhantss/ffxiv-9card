@@ -54,7 +54,7 @@ const eorzeaMapServer = initEorzeaMapServer();
 eorzeaMapServer.start();
 const offlineAssets = path.resolve(EORZA_MAP_PATH, 'assets');
 const offlineAssetsExisted = fs.existsSync(offlineAssets);
-const offlineMode = offlineAssetsExisted && fs.statSync(offlineAssets.isDirectory());
+const offlineMode = offlineAssetsExisted && fs.statSync(offlineAssets).isDirectory();
 // susu cdn https://map-cdn.ffxiv.cn/assets  NO CORS
 // cafe cdn https://map-cdn.wakingsands.com/assets
 const eorzeaMapUrl = `http://localhost:24321/${offlineMode ? 'index.html' : 'online.html'}`;
