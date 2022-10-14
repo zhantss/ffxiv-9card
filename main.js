@@ -12,6 +12,15 @@ const logger = require('./client/logger');
 const { bootstrap } = require('./client/common');
 const { eorzeaMapUrl, eorzeaMapServer, initEorzeaMapWindow } = require('./client/eorza-map');
 
+process.on('uncaughtException', (error) => {
+  logger.error('程序异常退出');
+  logger.error(error);
+  app.quit();
+  if (eorzeaMapServer != null) {
+    eorzeaMapServer.stop();
+  }
+});
+
 bootstrap();
 
 let eorzeaMapWindow = null;
