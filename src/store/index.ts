@@ -28,7 +28,12 @@ export interface State {
         avator?: string,
         rules?: string[],
         notAchiev?: boolean,
-        pos?: string,
+        pos?: {
+          id: number,
+          x: string,
+          y: string,
+          desc: string,
+        },
         prep?: {
           conj?: string,
           type: string,

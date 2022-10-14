@@ -1,15 +1,59 @@
 /* eslint-disable */
 const fs = require('fs');
+const path = require('path');
 const { pinyin } = require('pinyin-pro');
 const cardNpc = require('../wiki/ffxiv-9card-wiki-npc.json');
 const npcAppend = require('../wiki/ffxiv-9card-npc-append.json');
+const region = require('../eorzea-map/assets/data/region.json')
 const npcInfo = {};
+const regionMapping = {};
+
+region.forEach(r => {
+  r.maps.forEach(m => {
+    let rname = m.name;
+    if (m.subName.length > 0) {
+      rname = `${m.name} - ${m.subName}`;
+    }
+    if (regionMapping[rname] != null) {
+      console.log(`${rname}:${m.key}`)
+    } else {
+      regionMapping[rname] = m.key;
+    }
+  })
+})
+
 
 Object.keys(cardNpc).forEach(name => {
   if (npcAppend[name]) {
     npcInfo[name] = Object.assign({}, cardNpc[name], npcAppend[name])
   }
 })
+
+for(let name in npcInfo) {
+  let npc = npcInfo[name];
+  let pos = npc.pos;
+  const matchs = pos.match(/(\S+) \(X: (.+?), Y: (.+?)\)/);
+  if (matchs.length == 4) {
+    let map = matchs[1];
+    if (map == '金碟游乐场') {
+      map = `金碟游乐场 - 金碟游乐场`;
+    } else if (name == '格雷文') {
+      map = '游末邦 - 树梢层'
+    } else if (map == '乌尔达哈来生回廊') {
+      map = '乌尔达哈来生回廊 - 来生回廊'
+    }
+    let id = regionMapping[map];
+    if (id != null) {
+      npcInfo[name]['map'] = {
+        id: id,
+        x: matchs[2],
+        y: matchs[3]
+      }
+    } else {
+      console.log(`${npc.name} ${pos}`)
+    }
+  }
+}
 
 const avators = fs.readdirSync(__dirname + "/../public/ffxiv/npc")
 
@@ -124,7 +168,8 @@ fs.readFile(__dirname + '/../wiki/ffxiv-9card.json', (err, data) => {
                 const notAchiev = cur_npc["not-achiev"]
                 // const level = cur_npc.rules.length >= 2 ? cur_npc.rules[1] : null;
                 npc[npc_name].details = {
-                  pos: cur_npc.pos,
+                  // pos: cur_npc.pos,
+                  pos: {...cur_npc.map, desc: cur_npc.pos},
                   prep: cur_npc.prep
                 }
                 if (avator) npc[npc_name].details.avator = avator;

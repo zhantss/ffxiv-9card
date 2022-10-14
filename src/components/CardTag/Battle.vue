@@ -5,7 +5,12 @@ import TaskWiki from './Task.vue';
 
 interface Props {
   name: string;
-  pos: string;
+  pos: {
+    id: number,
+    x: string,
+    y: string,
+    desc: string
+  };
   prep?: {
     conj?: string;
     type: string;
@@ -26,11 +31,19 @@ const toNpcPage = (name: string) => {
     path: `/about/npc/${name}`,
   });
 };
+const openMap = (id: number, x: string, y: string) => {
+  if (window.$electron?.api) {
+    window.$electron?.api.openMap(id, x, y);
+  }
+  // TODO 警告
+};
 </script>
 
 <template>
   <span>
-    与{{ pos }}的
+    与
+    <n-button class="map-name" text @click="openMap(pos.id, pos.x, pos.y)">{{ pos.desc }}</n-button>
+    的
     <n-popover trigger="hover" v-if="prep?.length">
       <template #trigger>
         <n-button class="npc-name npc-prep" text @click="toNpcPage(name)">{{ name }}</n-button>
@@ -51,6 +64,9 @@ const toNpcPage = (name: string) => {
 </template>
 
 <style scoped lang="scss">
+.map-name {
+  color: #77d1ff;
+}
 .npc-name {
   color: #77d1ff;
 }

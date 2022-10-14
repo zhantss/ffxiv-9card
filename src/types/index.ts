@@ -15,7 +15,12 @@ export interface Card {
     description: string,
     battle?: {
       name: string;
-      pos: string;
+      pos: {
+        id: number,
+        x: string,
+        y: string,
+        desc: string,
+      },
       prep?: {
         conj?: string;
         type: string;

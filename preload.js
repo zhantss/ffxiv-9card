@@ -22,6 +22,9 @@ contextBridge.exposeInMainWorld('$electron', {
       console.log(url);
       ipcRenderer.invoke('openUrl', url);
     },
+    openMap: async (id, x, y) => {
+      ipcRenderer.invoke('openMap', id, x, y);
+    },
     loadingEnd: async () => ipcRenderer.invoke('loadingEnd'),
     // getStoreValue: async (key) => ipcRenderer.invoke('getStoreValue', key),
     // setStoreValue: async (key, data) => ipcRenderer.invoke('setStoreValue', key, data),

@@ -6,72 +6,30 @@ const {
 // const Store = require('electron-store');
 const path = require('path');
 const fs = require('fs');
-const { createLogger, format, transports } = require('winston');
 
-const levelFormat = (level) => {
-  switch (level) {
-    case 'error': return 'ERROR   :';
-    case 'debug': return 'DEBUG   :';
-    case 'warn': return 'WARN    :';
-    case 'info':
-    default: return 'INFO    :';
-  }
-};
+const { DATA_FILE } = require('./client/env');
+const logger = require('./client/logger');
+const { bootstrap } = require('./client/common');
+const { eorzeaMapUrl, eorzeaMapServer, initEorzeaMapWindow } = require('./client/eorza-map');
 
-const formatter = format.printf(({
-  level, message, label, timestamp,
-}) => `${timestamp} [${label}] ${levelFormat(level)} ${message}`);
+bootstrap();
 
-const logger = createLogger({
-  level: 'debug',
-  format: format.combine(
-    format.colorize(),
-    format.label({ label: 'main.js' }),
-    format.timestamp(),
-    formatter,
-  ),
-  transports: [
-    new transports.Console(),
-    new transports.File({
-      filename: './logs/ffxiv-9card.log',
-    }),
-  ],
-});
-
-const USER_HOME = process.env.HOME || process.env.USERPROFILE;
-const FFXIV_9CARD_PATH = path.resolve(USER_HOME, '.ffxiv-9card');
-const DATA_FILE = path.resolve(FFXIV_9CARD_PATH, 'data.json');
-
-const initConfigDir = () => {
-  try {
-    const stats = fs.statSync(FFXIV_9CARD_PATH);
-    if (stats && stats.isDirectory()) {
-      logger.debug('确认数据目录...');
-    } else {
-      logger.error('路径被占用, 请使用其他目录');
-    }
-  } catch (error) {
-    logger.warn(`数据目录不存在 ${error}, 即将创建目录`);
-    fs.mkdirSync(FFXIV_9CARD_PATH);
-  }
-};
-
-const initDataFile = () => {
-  try {
-    const stats = fs.statSync(DATA_FILE);
-    if (stats && stats.isFile()) {
-      logger.debug('确认默认数据文件...');
-    } else {
-      logger.error('路径被占用, 请使用其他目录');
-    }
-  } catch (error) {
-    logger.warn(`数据文件不存在 ${error}, 即将创建文件`);
-    fs.writeFileSync(DATA_FILE, JSON.stringify([]));
-  }
-};
+let eorzeaMapWindow = null;
 
 ipc.handle('openUrl', (event, url) => {
   shell.openExternal(url);
+});
+
+ipc.handle('openMap', (event, id, x, y) => {
+  if (eorzeaMapWindow == null) return;
+  if (eorzeaMapWindow.isDestroyed()) {
+    eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`);
+  } else {
+    eorzeaMapWindow.loadURL(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`).then(() => {
+      eorzeaMapWindow.show();
+      eorzeaMapWindow.focus();
+    });
+  }
 });
 
 ipc.handle('exportCardInfo', (event, data) => {
@@ -120,18 +78,17 @@ if (process.env.NODE_ENV !== 'development') {
   Menu.setApplicationMenu(null);
 }
 
-initConfigDir();
-initDataFile();
-
 const loadingWindow = () => {
   const loading = new BrowserWindow({
     height: 360,
     width: 360,
     show: false,
     useContentSize: true,
-    transparent: false,
+    transparent: true,
     maximizable: false,
     frame: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
   });
   loading.loadURL(path.join(__dirname, 'electron/loading.html')).then(() => {
     loading.show();
@@ -168,10 +125,24 @@ const createWindow = (width, height) => {
   if (process.platform === 'darwin') {
     app.dock.setIcon(path.join(__dirname, 'public/9card.png'));
   }
+  bwin.on('closed', () => {
+    if (eorzeaMapWindow != null) {
+      eorzeaMapWindow.destroy();
+    }
+  });
   ipc.handle('loadingEnd', () => {
     loading.close();
     bwin.show();
     bwin.focus();
+    if (eorzeaMapServer != null) {
+      const {
+        x: mainX, y: mainY, width: mainWidth, height: mainHeight,
+      } = bwin.getBounds();
+      eorzeaMapWindow = initEorzeaMapWindow(
+        `${eorzeaMapUrl}?id=92`, mainX + mainWidth, mainY + mainHeight,
+      );
+      // eorzeaMapWindow.show();
+    }
   });
 };
 
@@ -180,7 +151,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     // macOS bug fix
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow(1400, 1200);
+      createWindow(1600, 900);
     }
   });
 });
@@ -188,5 +159,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+    if (eorzeaMapServer != null) {
+      eorzeaMapServer.stop();
+    }
   }
 });
