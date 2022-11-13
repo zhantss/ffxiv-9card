@@ -3,9 +3,9 @@
 const {
   app, dialog, shell, ipcMain: ipc, BrowserWindow, Menu,
 } = require('electron');
-// const Store = require('electron-store');
 const path = require('path');
 const fs = require('fs');
+const env = require("./package.json").PROCESS_ENV;
 
 const { DATA_FILE } = require('./client/env');
 const logger = require('./client/logger');
@@ -139,7 +139,7 @@ const createWindow = (width, height) => {
   const url = process.env.NODE_ENV === 'development' ? 'http://localhost:23001'
     : `file://${path.join(__dirname, 'dist/index.html')}`;
   bwin.loadURL(url);
-  logger.info(`当前运行环境${process.env.NODE_ENV}`);
+  logger.info(`当前运行环境${env}`);
   if (process.env.NODE_ENV === 'development') {
     bwin.webContents.openDevTools({ mode: 'detach' });
   }
@@ -162,7 +162,6 @@ const createWindow = (width, height) => {
       eorzeaMapWindow = initEorzeaMapWindow(
         `${eorzeaMapUrl}?id=92`, mainX + mainWidth, mainY + mainHeight,
       );
-      // eorzeaMapWindow.show();
     }
   });
   return bwin;

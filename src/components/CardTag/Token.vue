@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { withDefaults, defineProps } from 'vue';
+import { withDefaults } from 'vue';
 
 interface Props {
   name: string
@@ -57,7 +57,7 @@ const openMap = (id: number, x: string, y: string) => {
 }
 .map-name::before {
   content: "";
-  background: url('../card/map-marked.png') no-repeat 0 0;
+  background: url('/card/map-marked.png') no-repeat 0 0;
   background-size: cover;
   display: inline-block;
   height: 16px;

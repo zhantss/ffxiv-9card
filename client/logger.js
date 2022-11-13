@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
 const { createLogger, format, transports } = require('winston');
-const env = require('./env');
+const { LOG_FILE } = require('./env');
+
+// clean log file
+if (fs.existsSync(LOG_FILE)) {
+  fs.truncateSync(LOG_FILE);
+}
 
 const levelFormat = (level) => {
   switch (level) {
@@ -27,7 +33,10 @@ const logger = createLogger({
   transports: [
     new transports.Console(),
     new transports.File({
-      filename: `${env.FFXIV_9CARD_PATH}/logs/ffxiv-9card.log`,
+      filename: LOG_FILE,
+      // 10m
+      maxsize: 10485760,
+      maxFiles: 10,
     }),
   ],
 });

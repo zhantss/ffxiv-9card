@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { withDefaults, defineProps, defineEmits } from 'vue';
+import { withDefaults } from 'vue';
 
 interface Props {
   taskType: string;

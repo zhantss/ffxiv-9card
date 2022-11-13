@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-  withDefaults, defineProps, defineEmits, computed, h,
+  withDefaults,
+  computed, h,
 } from 'vue';
 import {
   NDataTable, NSpace,

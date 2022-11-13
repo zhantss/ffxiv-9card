@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-  defineProps, withDefaults, defineEmits, computed,
-} from 'vue';
+import { withDefaults, computed } from 'vue';
 import { Card } from '@/types';
 
 interface Props {
