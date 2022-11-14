@@ -14,7 +14,7 @@ const FFXIV_9CARD_PATH = process.env.NODE_ENV === 'development' ? path.resolve(_
 // FFXIV_9CARD_PATH/eorzea-map
 const EORZA_MAP_PATH = path.resolve(FFXIV_9CARD_PATH, 'eorzea-map');
 // FFXIV_9CARD_PATH/logs/ffxiv-9card.log
-const LOG_FILE = path.resolve(FFXIV_9CARD_PATH, 'logs/ffxiv-9card.log')
+const LOG_FILE = path.resolve(FFXIV_9CARD_PATH, 'logs/ffxiv-9card.log');
 
 module.exports = {
   USER_HOME,

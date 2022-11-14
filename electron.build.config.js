@@ -1,55 +1,55 @@
-const includeEorzeaMap = process.env.EORZEAMAP
+const includeEorzeaMap = process.env.EORZEAMAP;
 const extraResources = [
   {
-    "from": "eorzea-map/index.html",
-    "to": "../eorzea-map/index.html"
+    from: 'eorzea-map/index.html',
+    to: '../eorzea-map/index.html',
   },
   {
-    "from": "eorzea-map/online.html",
-    "to": "../eorzea-map/online.html"
+    from: 'eorzea-map/online.html',
+    to: '../eorzea-map/online.html',
   },
   {
-    "from": "eorzea-map/static",
-    "to": "../eorzea-map/static"
-  }
-]
+    from: 'eorzea-map/static',
+    to: '../eorzea-map/static',
+  },
+];
 if (includeEorzeaMap) {
   extraResources.push({
-    "from": "eorzea-map/assets",
-    "to": "../eorzea-map/assets"
-  })
+    from: 'eorzea-map/assets',
+    to: '../eorzea-map/assets',
+  });
 }
 module.exports = {
-  appId: "pro.zhantss.ffxiv.9card",
-  productName: "ffxiv-9card",
+  appId: 'pro.zhantss.ffxiv.9card',
+  productName: 'ffxiv-9card',
   files: [
-    "dist/**",
-    "public/**",
-    "client/**",
-    "main.js",
-    "preload.js",
-    "electron/**"
+    'dist/**',
+    'public/**',
+    'client/**',
+    'main.js',
+    'preload.js',
+    'electron/**',
   ],
-  extraResources: extraResources,
+  extraResources,
   mac: {
-    "category": "public.app-category.utilities"
+    category: 'public.app-category.utilities',
   },
   win: {
-    "target": "nsis",
-    "icon": "public/favicon_256.ico"
+    target: 'nsis',
+    icon: 'public/favicon_256.ico',
   },
   nsis: {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "installerIcon": "public/favicon_256.ico",
-    "installerHeaderIcon": "public/favicon_256.ico",
-    "deleteAppDataOnUninstall": true
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    installerIcon: 'public/favicon_256.ico',
+    installerHeaderIcon: 'public/favicon_256.ico',
+    deleteAppDataOnUninstall: true,
   },
   directories: {
-    "buildResources": "assets",
-    "output": "target/electron"
+    buildResources: 'assets',
+    output: 'target/electron',
   },
   extraMetadata: {
-    PROCESS_ENV: process.env.NODE_ENV
+    PROCESS_ENV: process.env.NODE_ENV,
   },
-}
+};

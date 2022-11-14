@@ -5,7 +5,7 @@ const {
 } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const env = require("./package.json").PROCESS_ENV;
+const env = require('./package.json').PROCESS_ENV;
 
 const { DATA_FILE } = require('./client/env');
 const logger = require('./client/logger');
@@ -37,9 +37,7 @@ ipc.handle('openMap', (event, id, x, y) => {
       const {
         x: mainX, y: mainY, width: mainWidth, height: mainHeight,
       } = mainWindow.getBounds();
-      eorzeaMapWindow = initEorzeaMapWindow(
-        `${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`, mainX + mainWidth, mainY + mainHeight,
-      );
+      eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`, mainX + mainWidth, mainY + mainHeight);
     } else {
       eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=${id}&x=${x}&y=${y}`);
     }
@@ -159,9 +157,7 @@ const createWindow = (width, height) => {
       const {
         x: mainX, y: mainY, width: mainWidth, height: mainHeight,
       } = bwin.getBounds();
-      eorzeaMapWindow = initEorzeaMapWindow(
-        `${eorzeaMapUrl}?id=92`, mainX + mainWidth, mainY + mainHeight,
-      );
+      eorzeaMapWindow = initEorzeaMapWindow(`${eorzeaMapUrl}?id=92`, mainX + mainWidth, mainY + mainHeight);
     }
   });
   return bwin;
