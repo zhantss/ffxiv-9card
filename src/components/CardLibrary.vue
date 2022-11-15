@@ -364,6 +364,7 @@ const autoOptions = computed(() => {
       </n-layout-header>
       <n-layout position="absolute" style="top: 50px">
         <n-layout-content
+          id="card-library-content"
           position="absolute"
           style="padding: 0 50px 0 50px"
           :native-scrollbar="false"

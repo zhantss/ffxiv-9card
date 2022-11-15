@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { withDefaults } from 'vue';
 import { useRouter } from 'vue-router';
-import TaskWiki from './Task.vue';
+import TaskWiki from './TaskWiki.vue';
 
 interface Props {
   name: string;

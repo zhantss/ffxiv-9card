@@ -1,30 +1,17 @@
-const includeEorzeaMap = process.env.EORZEAMAP;
 const extraResources = [
   {
-    from: 'eorzea-map/index.html',
-    to: '../eorzea-map/index.html',
+    from: 'dist/ffxiv-9card-assets.zip',
+    to: 'ffxiv-9card-assets.zip',
   },
   {
-    from: 'eorzea-map/online.html',
-    to: '../eorzea-map/online.html',
-  },
-  {
-    from: 'eorzea-map/static',
-    to: '../eorzea-map/static',
+    from: 'dist/ffxiv-9card-assets/ffxiv.9card.version',
+    to: '../ffxiv.9card.version',
   },
 ];
-if (includeEorzeaMap) {
-  extraResources.push({
-    from: 'eorzea-map/assets',
-    to: '../eorzea-map/assets',
-  });
-}
 module.exports = {
   appId: 'pro.zhantss.ffxiv.9card',
   productName: 'ffxiv-9card',
   files: [
-    'dist/**',
-    'public/**',
     'client/**',
     'main.js',
     'preload.js',
@@ -44,6 +31,7 @@ module.exports = {
     installerIcon: 'public/favicon_256.ico',
     installerHeaderIcon: 'public/favicon_256.ico',
     deleteAppDataOnUninstall: true,
+    warningsAsErrors: false,
   },
   directories: {
     buildResources: 'assets',

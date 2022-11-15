@@ -3,10 +3,11 @@ import { withDefaults, computed } from 'vue';
 import { Card } from '@/types';
 
 interface Props {
-  card: Card,
-  has: boolean,
+  card: Card
+  has: boolean
   size?: number
   showId?: boolean
+  lazyLoadingId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -38,6 +39,10 @@ const noCardStyle = computed(() => ({
     :size="size" class="card-icon"
     :style="{
       '--color': 'rgba(255,255,255,0)',
+    }"
+    :lazy="lazyLoadingId ? true : false"
+    :intersection-observer-options="{
+      root: lazyLoadingId ? '#card-library-content' : lazyLoadingId
     }"
     :src="`./ffxiv/icon/${card?.icon}`" />
   </div>

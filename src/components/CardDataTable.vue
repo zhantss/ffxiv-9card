@@ -68,6 +68,7 @@ const createColumns = ({ wiki }: ColumnsOptions) => [
           has: !props.has(card.id),
           card,
           onChose: thisChose,
+          lazyLoadingId: 'card-library-content',
         },
       );
     },

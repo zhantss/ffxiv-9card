@@ -1,5 +1,6 @@
 wiki
 config
+client/ssl
 logs
 utils/*.json
 utils/*.xml
@@ -7,6 +8,13 @@ utils/*.list
 deprecated
 stats.html
 target
+local
+test
+
+build/EnvVarUpdate.nsh
+
+public/ffxiv.9card.version
+ffxiv.9card.version
 
 eorzea-map/assets/**
 eorzea-map/static/**

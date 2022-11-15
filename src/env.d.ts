@@ -15,6 +15,7 @@ interface Window {
 interface ImportMetaEnv extends Readonly<Record<string, string>> {
   readonly VITE_APP_NAME: string
   readonly VITE_APP_ID: string
+  readonly VITE_APP_MODE: string
 }
 
 interface ImportMeta {

@@ -243,7 +243,7 @@ const columns = createColumns({
             </div>
           </n-space>
         </n-layout-header>
-        <n-layout-content style="height: 82%;" :native-scrollbar="false">
+        <n-layout-content id="card-about-content" style="height: 82%;" :native-scrollbar="false">
           <n-data-table
             :columns="columns"
             :row-props="(rowProps as any)"

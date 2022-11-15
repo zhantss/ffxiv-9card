@@ -1,6 +1,6 @@
 {
   "name": "ffxiv-9card",
-  "version": "0.2.2",
+  "version": "0.3.0-alpha.1",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
@@ -9,15 +9,16 @@
     "serve": "vite preview",
     "electron:serve": "cross-env NODE_ENV=development electron .",
     "electron:pre": "cross-env NODE_ENV=production vite build && cross-env NODE_ENV=development electron .",
-    "electron:build": "cross-env NODE_ENV=production vite build && cross-env NODE_ENV=production electron-builder --config electron.build.config.js",
-    "electron:buildWithEorzeaMap": "cross-env NODE_ENV=production vite build && cross-env NODE_ENV=production EORZEAMAP=true electron-builder --config electron.build.config.js"
+    "electron:build": "cross-env NODE_ENV=production vite build && cross-env NODE_ENV=production electron-builder --config electron.build.config.js"
   },
   "dependencies": {
-    "compression": "^1.7.4",
     "dexie": "^3.2.2",
     "express": "^4.18.2",
+    "express-static-gzip": "^2.1.7",
+    "fs-extra": "^10.1.0",
     "fuse.js": "^6.6.2",
     "lodash": "^4.17.21",
+    "node-stream-zip": "^1.15.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0",
@@ -29,6 +30,7 @@
     "@vicons/material": "^0.12.0",
     "@vicons/tabler": "^0.12.0",
     "@vitejs/plugin-vue": "^3.2.0",
+    "compressing": "^1.6.2",
     "cross-env": "^7.0.3",
     "electron": "^21.2.3",
     "electron-builder": "^23.6.0",
@@ -37,6 +39,7 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-vue": "^9.7.0",
+    "moment": "^2.29.4",
     "naive-ui": "^2.33.5",
     "pinyin-pro": "^3.11.0",
     "rollup-plugin-visualizer": "^5.8.3",
@@ -46,6 +49,7 @@
     "vfonts": "^0.1.0",
     "vite": "^3.2.3",
     "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-static-copy": "^0.12.0",
     "vue-tsc": "^1.0.9"
   }
 }

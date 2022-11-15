@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/leaflet.css">
-    <link rel="stylesheet" href="/static/map.css">
-    <script src="/static/jquery.min.js"></script>
-    <script src="/static/map.js"></script>
+    <link rel="stylesheet" href="/eorzea-map/static/leaflet.css">
+    <link rel="stylesheet" href="/eorzea-map/static/map.css">
+    <script src="/eorzea-map/static/jquery.min.js"></script>
+    <script src="/eorzea-map/static/map.js"></script>
     <title>eorzea-map</title>
     <style>
         html,
@@ -37,7 +37,7 @@
             right: 0;
             -webkit-app-region: drag;
             z-index: 999;
-            background-image: url('./static/060582.png');
+            background-image: url('/eorzea-map/static/060582.png');
             background-repeat:no-repeat;
             background-position: 10% center;
         }
@@ -67,7 +67,7 @@
             return pos;
         }
         $(document).ready(function() {
-            window.YZWF.eorzeaMap.setCdnUrl("/assets");
+            window.YZWF.eorzeaMap.setCdnUrl("/eorzea-map/assets");
 
             const el = document.querySelector('#eorzea-map');
             window.YZWF.eorzeaMap.create(el)

@@ -1,10 +1,10 @@
-import Id from './Id.vue';
-import Wiki from './Wiki.vue';
-import Patch from './Patch.vue';
-import Org from './Org.vue';
-import Task from './Task.vue';
-import Battle from './Battle.vue';
-import Token from './Token.vue';
+import Id from './CardTagId.vue';
+import Wiki from './CardWiki.vue';
+import Patch from './CardTagPatch.vue';
+import Org from './CardTagOrg.vue';
+import Task from './TaskWiki.vue';
+import Battle from './BattleInfo.vue';
+import Token from './TokenInfo.vue';
 
 export const CardTagId = Id;
 export const CardWiki = Wiki;

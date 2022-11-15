@@ -7,12 +7,12 @@ import {
   NLayout, useLoadingBar, useNotification, useDialog,
 } from 'naive-ui';
 import { useStore } from '@/store';
-import Menu from '@/layout/Menu.vue';
+import MenuBar from '@/layout/MenuBar.vue';
 import UserCardDB from '@/store/db';
 
 export default defineComponent({
   components: {
-    Menu,
+    MenuBar,
     NLayout,
     RouterView,
   },
@@ -101,7 +101,7 @@ export default defineComponent({
 
 <template>
   <n-layout position="absolute" style="height: 100%">
-    <Menu />
+    <MenuBar />
     <n-layout has-sider position="absolute" style="top: 50px">
       <router-view
           @vnode-updated="closeLoading"

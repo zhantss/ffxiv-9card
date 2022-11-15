@@ -1,65 +1,33 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
-const compression = require('compression');
+const fs = require('fs-extra');
 const {
   BrowserWindow, Menu,
 } = require('electron');
+const { getEorzeaMapUrl, getEorzeaMapAssets } = require('./env');
 
-const { EORZA_MAP_PATH } = require('./env');
-const logger = require('./logger');
-
-const createEorzaMapServer = (eorzaMapPath, port) => {
-  this.server = null;
-  this.eorzaMapPath = eorzaMapPath;
-  this.port = port == null ? 4321 : port;
-
-  // GZIP
-  this.app = express();
-  this.app.use(compression());
-
-  this.start = () => {
-    if (this.server != null) {
-      return;
-    }
-    this.app.use(express.static(this.eorzaMapPath));
-    this.server = this.app.listen(this.port);
-    logger.debug('地图服务启动, port on 24321');
-  };
-
-  this.stop = () => {
-    if (this.server != null) {
-      this.server.close((err) => {
-        process.exit(err ? 1 : 0);
-      });
-    }
-  };
-  return this;
+const eorzeaMapConfig = {
+  offline: false,
+  baseUrl: `${getEorzeaMapUrl()}/online.html`,
 };
 
-const initEorzeaMapServer = () => {
-  try {
-    const stats = fs.statSync(EORZA_MAP_PATH);
-    if (stats && stats.isDirectory()) {
-      return createEorzaMapServer(EORZA_MAP_PATH, 24321);
-    }
-  } catch (error) {
-    logger.error(`地图服务启动失败 ${error}`);
-  }
-  return null;
+const updateEorzeaMapConfig = () => {
+  eorzeaMapConfig.offline = fs.pathExistsSync(getEorzeaMapAssets());
+  eorzeaMapConfig.baseUrl = `${getEorzeaMapUrl()}/${eorzeaMapConfig.offline ? 'index.html' : 'online.html'}`;
+  console.log(JSON.stringify(eorzeaMapConfig));
 };
 
-const eorzeaMapServer = initEorzeaMapServer();
-eorzeaMapServer.start();
-const offlineAssets = path.resolve(EORZA_MAP_PATH, 'assets');
-const offlineAssetsExisted = fs.existsSync(offlineAssets);
-const offlineMode = offlineAssetsExisted && fs.statSync(offlineAssets).isDirectory();
-// susu cdn https://map-cdn.ffxiv.cn/assets  NO CORS
-// cafe cdn https://map-cdn.wakingsands.com/assets
-const eorzeaMapUrl = `http://localhost:24321/${offlineMode ? 'index.html' : 'online.html'}`;
+const getEorzeaMapBaseUrl = () => eorzeaMapConfig.baseUrl;
 
-const initEorzeaMapWindow = (url, x, y) => {
+// const offlineAssets = getEorzeaMapAssets();
+// const offlineMode = fs.pathExistsSync(offlineAssets);
+// // susu cdn https://map-cdn.ffxiv.cn/assets  NO CORS
+// // cafe cdn https://map-cdn.wakingsands.com/assets
+// const eorzeaMapBaseUrl = `${getEorzeaMapUrl()}/${offlineMode ? 'index.html' : 'online.html'}`;
+
+const initEorzeaMapWindow = (pos, x, y) => {
+  const url = pos && pos.x && pos.y
+    ? `${eorzeaMapConfig.baseUrl}/?id=${pos.id}&x=${pos.x}&y=${pos.y}`
+    : `${eorzeaMapConfig.baseUrl}/?id=${pos.id}`;
   const mapWin = new BrowserWindow({
     height: 480,
     width: 480,
@@ -79,14 +47,11 @@ const initEorzeaMapWindow = (url, x, y) => {
   mapWin.on('closed', () => {
     mapWin.destroy();
   });
-  if (process.env.NODE_ENV === 'development') {
-    mapWin.webContents.openDevTools({ mode: 'detach' });
-  }
   return mapWin;
 };
 
 module.exports = {
-  eorzeaMapUrl,
-  eorzeaMapServer,
+  updateEorzeaMapConfig,
+  getEorzeaMapBaseUrl,
   initEorzeaMapWindow,
 };

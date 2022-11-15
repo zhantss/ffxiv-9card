@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
+const fs = require('fs-extra');
 const { createLogger, format, transports } = require('winston');
 const { LOG_FILE } = require('./env');
 
@@ -18,6 +18,10 @@ const levelFormat = (level) => {
   }
 };
 
+const timezoned = () => new Date().toLocaleString('en-US', {
+  timeZone: 'Asia/Shanghai',
+});
+
 const formatter = format.printf(({
   level, message, label, timestamp,
 }) => `${timestamp} [${label}] ${levelFormat(level)} ${message}`);
@@ -27,7 +31,7 @@ const logger = createLogger({
   format: format.combine(
     format.colorize(),
     format.label({ label: 'main.js' }),
-    format.timestamp(),
+    format.timestamp({ format: timezoned }),
     formatter,
   ),
   transports: [
