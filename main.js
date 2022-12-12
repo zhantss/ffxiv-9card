@@ -6,9 +6,9 @@ const {
 const path = require('path');
 const fs = require('fs');
 
+const logger = require('./client/logger');
 const { PROCESS_ENV } = require('./package.json');
 const { DATA_FILE } = require('./client/env');
-const logger = require('./client/logger');
 const { bootstrap } = require('./client/common');
 const { getServerUrl, getResourceDir } = require('./client/env');
 const { createResourceServer } = require('./client/web-server');
@@ -33,6 +33,12 @@ const exitApp = () => {
 process.on('uncaughtException', (error) => {
   logger.error('程序异常退出');
   logger.error(error);
+  dialog.showMessageBoxSync({
+    type: 'error',
+    title: '错误',
+    message: error ? error.message : '未知错误, 请将日志文件发送给开发者',
+    buttons: ['OK'],
+  });
   exitApp();
   app.exit();
 });
@@ -50,10 +56,13 @@ const createloadingWindow = (callback) => {
     frame: false,
     skipTaskbar: true,
     alwaysOnTop: true,
+    icon: path.join(__dirname, 'electron/9card.png'),
   });
-  loading.once('show', callback);
   loading.loadFile(path.join(__dirname, 'electron/loading.html'));
-  loading.show();
+  loading.once('ready-to-show', () => {
+    loading.show();
+    callback();
+  });
 
   loading.on('closed', () => {
     logger.info('loading finshed');
@@ -71,7 +80,7 @@ const createMainWindow = (width, height) => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
-    icon: path.join(__dirname, 'public/9card.png'),
+    icon: path.join(__dirname, 'electron/9card.png'),
   });
   const url = process.env.NODE_ENV === 'development'
     ? 'http://localhost:23001'
@@ -80,7 +89,7 @@ const createMainWindow = (width, height) => {
   main.loadURL(url);
   logger.info(`当前运行环境: ${PROCESS_ENV || process.env.NODE_ENV}`);
   if (process.platform === 'darwin') {
-    app.dock.setIcon(path.join(__dirname, 'public/9card.png'));
+    app.dock.setIcon(path.join(__dirname, 'electron/9card.png'));
   }
   main.on('closed', () => {
     exitApp();
@@ -91,11 +100,16 @@ const createMainWindow = (width, height) => {
 const setup = () => {
   // create loading window
   loadingWindow = createloadingWindow(() => {
-    // start resource server
-    resourceServer = createResourceServer(getResourceDir(), 24321);
-    resourceServer.start();
-    // create main window
-    mainWindow = createMainWindow(1600, 900);
+    bootstrap().then(() => {
+      // start resource server
+      resourceServer = createResourceServer(getResourceDir(), 24321);
+      resourceServer.start();
+      // create main window
+      mainWindow = createMainWindow(1600, 900);
+    }).catch((error) => {
+      logger.error(`程序启动失败, error ${error}`);
+      exitApp();
+    });
   });
 };
 
@@ -204,10 +218,5 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(() => {
-  bootstrap().then(() => {
-    setup();
-  }).catch((error) => {
-    logger.error(`程序启动失败, error ${error}`);
-    exitApp();
-  });
+  setup();
 });

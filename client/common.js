@@ -2,7 +2,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const StreamZip = require('node-stream-zip');
-const { dialog } = require('electron');
+const { dialog, BrowserWindow } = require('electron');
 const logger = require('./logger');
 const env = require('./env');
 const { updateEorzeaMapConfig } = require('./eorza-map');
@@ -39,12 +39,13 @@ const initFile = (file, isArray) => {
   }
 };
 
-const showConfirmDialog = ({ type, message }) => dialog.showMessageBoxSync({
-  type,
-  message: `${message}, 确认吗?`,
-  buttons: ['确认', '取消'],
-  cancelId: 999,
-});
+const showConfirmDialog = ({ type, message }) => dialog
+  .showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
+    type,
+    message: `${message}, 确认吗?`,
+    buttons: ['确认', '取消'],
+    cancelId: 999,
+  });
 
 const unzip = async (zipFile, fileName, outPath) => {
   // eslint-disable-next-line new-cap
@@ -93,32 +94,44 @@ const updateResource = async (dir, update) => {
 };
 
 const resourceSelection = async () => {
-  await dialog.showOpenDialog({
-    title: '安装资源数据',
-    defaultPath: path.resolve(env.FFXIV_9CARD_HOME, '../'),
-    message: '请选择资源数据的安装目录',
-    properties: ['openDirectory'],
-  }).then(async (result) => {
-    const dir = result.filePaths[0];
-    const resDir = path.resolve(dir, env.RES_DIR_NAME);
-    const confirm = showConfirmDialog({ type: 'info', message: `安装将会清除 ${resDir} 目录` });
-    if (confirm < 1) {
-      try {
-        if (process.env.NODE_ENV !== 'development') {
-          await updateResource(resDir, false);
-        }
-        env.setResourceDir(resDir);
-      } catch (error) {
-        logger.error(`清理目录 ${resDir} 失败`);
-        throw error;
+  try {
+    const defaultPath = path.resolve(env.FFXIV_9CARD_HOME, `../${env.RES_DIR_NAME}`);
+    let targetDir = defaultPath;
+    const useDefault = dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
+      type: 'info',
+      title: '安装资源数据',
+      message: `数据资源将安装到${defaultPath}, 确认吗?`,
+      detail: '!! 请不要选择程序的安装目录 !!',
+      buttons: ['手动选择其他目录', '确认'],
+    });
+    if (useDefault < 1) {
+      const selection = dialog.showOpenDialogSync(BrowserWindow.getFocusedWindow(), {
+        title: '请选择资源数据的安装目录',
+        defaultPath,
+        message: '请选择资源数据的安装目录',
+        properties: ['openDirectory'],
+      });
+      if (selection.length === 0) {
+        throw Error('用户取消');
       }
+      [targetDir] = selection;
+      if (fs.readdirSync(targetDir).length !== 0) {
+        targetDir = path.join(targetDir, env.RES_DIR_NAME);
+      }
+    }
+    const confirm = showConfirmDialog({ type: 'info', message: `安装将会清除 ${targetDir} 目录` });
+    if (confirm < 1) {
+      if (process.env.NODE_ENV !== 'development') {
+        await updateResource(targetDir, false);
+      }
+      env.setResourceDir(targetDir);
     } else {
       throw Error('用户取消');
     }
-  }).catch((error) => {
-    logger.error(`程序因 ${error} 退出, 请联系开发者`);
+  } catch (error) {
+    logger.error(`程序因 ${error} 退出, 如有疑问请联系开发者`);
     throw error;
-  });
+  }
 };
 
 const verifyResourceVersion = async (versionFile) => {
@@ -143,6 +156,8 @@ const initConfigFile = async () => {
         if (process.env.NODE_ENV !== 'development') {
           await updateResource(config.resources, true);
         }
+      } else {
+        logger.info('资源数据版本超过客户端,无需更新');
       }
     } else {
       logger.warn(`无法从获取配置文件 ${env.CONFIG_FILE} 中获取资源目录, 请选择资源目录`);
