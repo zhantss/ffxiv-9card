@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('$electron', {
   // ipcRenderer,
   api: {
     on: (channel, callback) => ipcRenderer.on(channel, (event, argv) => callback(event, argv)),
+    openDevTools: () => ipcRenderer.invoke('openDevTools'),
     openUrl: async (url) => {
       console.log(url);
       ipcRenderer.invoke('openUrl', url);

@@ -47,7 +47,9 @@ watch(
   (ext) => {
     if (typeof ext === 'string') {
       currentExt.value = ext;
-      selection.value = menus.value[0].key;
+      if (selection.value == null) {
+        selection.value = menus.value[0].key;
+      }
     }
   },
 );

@@ -31,6 +31,11 @@ export default defineComponent({
         this.importCardInfoDialog(new Set<string>(cards));
       });
       window.$electron?.api.loadingEnd();
+      document.addEventListener('keyup', (event) => {
+        if (event?.key === 'F12') {
+          window.$electron?.api.openDevTools();
+        }
+      });
     }
   },
   setup(props, context) {

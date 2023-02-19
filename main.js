@@ -106,6 +106,7 @@ const setup = () => {
       resourceServer.start();
       // create main window
       mainWindow = createMainWindow(1600, 900);
+      mainWindow.webContents.session.clearCache();
     }).catch((error) => {
       logger.error(`程序启动失败, error ${error}`);
       exitApp();
@@ -130,6 +131,10 @@ ipc.handle('loadingEnd', () => {
       eorzeaMapWindow.webContents.openDevTools({ mode: 'detach' });
     }
   }
+});
+
+ipc.handle('openDevTools', () => {
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
 });
 
 ipc.handle('openUrl', (event, url) => {
